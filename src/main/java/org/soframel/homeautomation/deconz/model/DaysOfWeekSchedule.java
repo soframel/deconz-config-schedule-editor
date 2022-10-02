@@ -63,7 +63,6 @@ public class DaysOfWeekSchedule {
                 String decimalString = s.substring(1);
                 Integer i = Integer.parseInt(decimalString);
                 String binaryString = Integer.toBinaryString(i);
-                System.out.println("For "+s+", binaryString="+binaryString);
                 int length=binaryString.length();
                 schedule.setSunday(getBooleanForPosition(binaryString, length-1));
                 schedule.setSaturday(getBooleanForPosition(binaryString, length-2));

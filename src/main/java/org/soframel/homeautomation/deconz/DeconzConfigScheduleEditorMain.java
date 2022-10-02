@@ -28,9 +28,11 @@ public class DeconzConfigScheduleEditorMain {
             String sensorId = props.getProperty("sensorid");
 
             DeconzConfigScheduleClient client = new DeconzConfigScheduleClient(url, key, sensorId);
-            DeconzConfigScheduleEditorMain editor = new DeconzConfigScheduleEditorMain(client);
-            // editor.createWeekSchedules();
+            DeconzConfigScheduleEditorMain editor = new DeconzConfigScheduleEditorMain(client);            
             editor.printAllSchedules();
+
+            //TODO: add different parameters to recreate all schedules
+            // editor.createWeekSchedules();
 
         } catch (IOException e) {
             // TODO Auto-generated catch block

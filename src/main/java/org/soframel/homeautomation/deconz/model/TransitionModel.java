@@ -61,5 +61,9 @@ public class TransitionModel {
             return false;
         return true;
     }
+    @Override
+    public String toString() {
+        return "TransitionModel [time=" + time + ", temperature=" + temperature + "]";
+    }
 
 }
