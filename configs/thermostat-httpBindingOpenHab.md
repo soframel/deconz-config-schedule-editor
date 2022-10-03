@@ -6,17 +6,19 @@ Binding of type HTTP (doc: https://www.openhab.org/addons/bindings/http/)
 
 NOTE: Requires transformation add-ons JSONPATH and JINJA, to be installed in OpenHab add-ons page -> others -> transformations add-ons. 
 
-URL = $deconz/api/<key>/sensors/<id>
+## Thing configuration
+- URL = $deconz/api/<key>/sensors/<id>
+- leave or change username/password
+- commandMethod=PUT
+- contentType=application/json
 
-## Schedule Switch channel
+## Schedule Switch channel configuration
 
-type= switch
-onValue=true
-offValue=false
-stateTransformation=JSONPATH:$.config.schedule_on
-commandMethod=PUT
-contentType=application/json
-commandTransformation='JINJA:{"config": {"schedule_on": {{value}} }}'
+- type= switch
+- onValue=true
+- offValue=false
+- stateTransformation=JSONPATH:$.config.schedule_on
+- commandTransformation='JINJA:{"config": {"schedule_on": {{value}} }}'
 
 ## OpenHab  Yaml
 ````
