@@ -19,6 +19,7 @@ contentType=application/json
 commandTransformation='JINJA:{"config": {"schedule_on": {{value}} }}'
 
 ## OpenHab  Yaml
+````
 label: Thermostat 1 Schedule
 thingTypeUID: http:url
 configuration:
@@ -44,3 +45,4 @@ channels:
       offValue: "false"
       stateTransformation: JSONPATH:$.config.schedule_on
       commandTransformation: 'JINJA:{"config": {"schedule_on": {{value}} }}'
+````
