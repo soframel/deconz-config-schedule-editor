@@ -3,6 +3,7 @@ package org.soframel.homeautomation.deconz;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -16,6 +17,7 @@ import org.soframel.homeautomation.deconz.model.TransitionModel;
  * url (http://deconzHost:deconzPort)
  * key (your API Key)
  * sensorId
+ * then call with either no parameters (will print existing schedules), or "delete" to delete all, and/or "create" to (re-)create the schedules.
  */
 public class DeconzConfigScheduleEditorMain {
 
@@ -31,11 +33,18 @@ public class DeconzConfigScheduleEditorMain {
             DeconzConfigScheduleEditorMain editor = new DeconzConfigScheduleEditorMain(client);            
             editor.printAllSchedules();
 
-            //TODO: add different parameters to recreate all schedules
-            // editor.createWeekSchedules();
+            List<String> argsList=Arrays.asList(args);
+            if(argsList.contains("delete")){
+                System.out.println("Deleting existing schedules");
+                editor.deleteAllSchedules();
+            }
+            if(argsList.contains("create")){
+                System.out.println("Creating schedules");
+                editor.createWeekSchedules();
+            }
 
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+            System.out.println("an exception occured: "+e.getMessage());
             e.printStackTrace();
         }
     }
