@@ -2,8 +2,7 @@
 For features that are not available through the exposed channels on deconz binding. 
 Features supported for now: only schedule_on switch. 
 
-Binding of type HTTP
-(doc: https://www.openhab.org/addons/bindings/http/)
+Binding of type HTTP (doc: https://www.openhab.org/addons/bindings/http/)
 
 NOTE: Requires transformation add-ons JSONPATH and JINJA, to be installed in OpenHab add-ons page -> others -> transformations add-ons. 
 
