@@ -2,6 +2,7 @@ package org.soframel.homeautomation.deconz.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 /**
  * List for each day (starting with 0 = holidays, 1=monday....7=sunday) of the transition models
  */
@@ -53,4 +54,37 @@ public class ScheduleForEachDay {
     public List<TransitionModel> getSundaySchedules(){
         return schedules.get(7);
     }
+
+    public static ScheduleForEachDay parseFromScheduleMap(Map<DaysOfWeekSchedule, List<TransitionModel>> schedule){
+        ScheduleForEachDay result=new ScheduleForEachDay();
+
+        for(DaysOfWeekSchedule s: schedule.keySet()){
+            if(s.isHolidays()){
+                result.addTransitionsToDay(0, schedule.get(s));
+            }
+            if(s.isMonday()){
+                result.addTransitionsToDay(1, schedule.get(s));
+            }
+            if(s.isTuesday()){
+                result.addTransitionsToDay(2, schedule.get(s));
+            }
+            if(s.isWednesday()){
+                result.addTransitionsToDay(3, schedule.get(s));
+            }
+            if(s.isThursday()){
+                result.addTransitionsToDay(4, schedule.get(s));
+            }
+            if(s.isFriday()){
+                result.addTransitionsToDay(5, schedule.get(s));
+            }
+            if(s.isSaturday()){
+                result.addTransitionsToDay(6, schedule.get(s));
+            }    
+            if(s.isSunday()){
+                result.addTransitionsToDay(7, schedule.get(s));
+            }                                                                                    
+        }
+        result.orderTransitions();
+        return result;
+    }    
 }
