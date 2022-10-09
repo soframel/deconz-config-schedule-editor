@@ -77,12 +77,12 @@ public class DeconzConfigScheduleEditorMain {
      * Schedules to be created
      */
     public void createWeekSchedules() {
-        DaysOfWeekSchedule scheduleSemaine = new DaysOfWeekSchedule(true, true, true, true, true, false, false, false);
+        DaysOfWeekSchedule scheduleSemaine = new DaysOfWeekSchedule(true, true, true, true, true, false, false);
         TransitionModel matinSemaine = new TransitionModel(LocalTime.of(7, 00), 1700);
         TransitionModel soirSemaine = new TransitionModel(LocalTime.of(21, 00), 1800);
         client.createSchedule(scheduleSemaine, matinSemaine, soirSemaine);
 
-        DaysOfWeekSchedule scheduleWE = new DaysOfWeekSchedule(false, false, false, false, false, true, true, false);
+        DaysOfWeekSchedule scheduleWE = new DaysOfWeekSchedule(false, false, false, false, false, true, true);
         TransitionModel matinWE = new TransitionModel(LocalTime.of(9, 00), 1700);
         TransitionModel soirWE = new TransitionModel(LocalTime.of(21, 00), 1800);
         client.createSchedule(scheduleWE, matinWE, soirWE);

@@ -1,10 +1,10 @@
 package org.soframel.homeautomation.deconz.model;
 
-import static org.junit.Assert.assertEquals;
-
 import java.time.LocalTime;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 import org.soframel.homeautomation.deconz.dto.Transition;
 import org.soframel.homeautomation.deconz.model.TransitionModel;
 

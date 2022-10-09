@@ -1,15 +1,18 @@
-package org.soframel.homeautomation.deconz;
+package org.soframel.homeautomation.deconz.model;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 import org.soframel.homeautomation.deconz.model.DaysOfWeekSchedule;
+
+import io.quarkus.test.junit.QuarkusTest;
 
 public class DaysOfWeekScheduleTest {
     @Test
     public void testToBitmap(){
 
-        DaysOfWeekSchedule schedule=new DaysOfWeekSchedule(false, false, false, false, false, false, true, false);
+        DaysOfWeekSchedule schedule=new DaysOfWeekSchedule(false, false, false, false, false, false, true);
         assertEquals(1, schedule.toBitmap());
         schedule.setFriday(true);
         assertEquals(5, schedule.toBitmap());
@@ -24,12 +27,12 @@ public class DaysOfWeekScheduleTest {
     @Test
     public void testParse(){
         DaysOfWeekSchedule schedule=DaysOfWeekSchedule.parse("W2");
-        assertEquals(new DaysOfWeekSchedule(false, false, false, false, false, true, false, false), schedule);
+        assertEquals(new DaysOfWeekSchedule(false, false, false, false, false, true, false), schedule);
 
         schedule=DaysOfWeekSchedule.parse("W65");
-        assertEquals(new DaysOfWeekSchedule(true, false, false, false, false, false, true, false), schedule);
+        assertEquals(new DaysOfWeekSchedule(true, false, false, false, false, false, true), schedule);
 
         schedule=DaysOfWeekSchedule.parse("W0");
-        assertEquals(new DaysOfWeekSchedule(false, false, false, false, false, false, false, true), schedule);
+        assertEquals(new DaysOfWeekSchedule(true), schedule);
     }
 }

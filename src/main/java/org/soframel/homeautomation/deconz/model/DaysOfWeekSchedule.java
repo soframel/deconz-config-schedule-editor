@@ -20,8 +20,12 @@ public class DaysOfWeekSchedule {
     public DaysOfWeekSchedule() {
     }
 
+    public DaysOfWeekSchedule(boolean holidays) {
+        this.holidays=holidays;
+    }
+
     public DaysOfWeekSchedule(boolean monday, boolean tuesday, boolean wednesday, boolean thursday, boolean friday,
-            boolean saturday, boolean sunday, boolean holidays) {
+            boolean saturday, boolean sunday) {
         this.monday = monday;
         this.tuesday = tuesday;
         this.wednesday = wednesday;
@@ -29,7 +33,7 @@ public class DaysOfWeekSchedule {
         this.friday = friday;
         this.saturday = saturday;
         this.sunday = sunday;
-        this.holidays = holidays;
+        this.holidays=false;
     }
 
     public int toBitmap() {

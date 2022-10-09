@@ -1,0 +1,67 @@
+{@org.soframel.homeautomation.deconz.model.ScheduleForEachDay schedules}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Schedules for thermostat {thermostat}</title> 
+</head>
+<body>
+    <h1>Weekly Schedules for Thermostat {thermostat}</h1>
+    
+    <h2>Holidays</h2>
+    <ul>
+    {#for transition in schedules.holidaySchedules}
+        <li>{transition.time} - {transition.temperature} °C</li>
+    {/for}    
+    </ul>
+
+    <h2>Monday</h2>
+    <ul>
+    {#for transition in schedules.mondaySchedules}
+        <li>{transition.time} - {transition.temperature} °C</li>
+    {/for}    
+    </ul>
+
+    <h2>Tuesday</h2>
+    <ul>
+    {#for transition in schedules.tuesdaySchedules}
+        <li>{transition.time} - {transition.temperature} °C</li>
+    {/for}    
+    </ul>
+
+    <h2>Wednesday</h2>
+    <ul>
+    {#for transition in schedules.wednesdaySchedules}
+        <li>{transition.time} - {transition.temperature} °C</li>
+    {/for}    
+    </ul>    
+
+    <h2>Thursday</h2>
+    <ul>
+    {#for transition in schedules.thursdaySchedules}
+        <li>{transition.time} - {transition.temperature} °C</li>
+    {/for}    
+    </ul>    
+
+    <h2>Friday</h2>
+    <ul>
+    {#for transition in schedules.fridaySchedules}
+        <li>{transition.time} - {transition.temperature} °C</li>
+    {/for}    
+    </ul>    
+
+    <h2>Saturday</h2>
+    <ul>
+    {#for transition in schedules.saturdaySchedules}
+        <li>{transition.time} - {transition.temperature} °C</li>
+    {/for}    
+    </ul>    
+
+    <h2>Sunday</h2>
+    <ul>
+    {#for transition in schedules.sundaySchedules}
+        <li>{transition.time} - {transition.temperature} °C</li>
+    {/for}    
+    </ul>    
+</body>
+</html>
