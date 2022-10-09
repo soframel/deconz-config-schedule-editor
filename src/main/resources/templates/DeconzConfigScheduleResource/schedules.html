@@ -22,8 +22,8 @@
     {#for transition in schedules.mondaySchedules}
         <li><input name="monday-{transition_index}-time" value="{transition.time}"/> : <input name="monday-{transition_index}-temperature" value="{transition.temperature}"/> °C</li>
     {/for}    
-        <li><input name="monday-{schedules.holidaySchedules.size}-time" value=""/> : <input name="monday-{schedules.holidaySchedules.size}-temperature" value=""/> °C</li>
-        <li><input name="monday-{schedules.holidaySchedules.size + 1}-time" value=""/> : <input name="monday-{schedules.holidaySchedules.size + 1}-temperature" value=""/> °C</li>
+        <li><input name="monday-{schedules.mondaySchedules.size}-time" value=""/> : <input name="monday-{schedules.mondaySchedules.size}-temperature" value=""/> °C</li>
+        <li><input name="monday-{schedules.mondaySchedules.size + 1}-time" value=""/> : <input name="monday-{schedules.mondaySchedules.size + 1}-temperature" value=""/> °C</li>
     </ul>
 
     <h2>Tuesday</h2>
@@ -31,8 +31,8 @@
     {#for transition in schedules.tuesdaySchedules}
         <li><input name="tuesday-{transition_index}-time" value="{transition.time}"/> : <input name="tuesday-{transition_index}-temperature" value="{transition.temperature}"/> °C</li>
     {/for}    
-        <li><input name="tuesday-{schedules.holidaySchedules.size}-time" value=""/> : <input name="tuesday-{schedules.holidaySchedules.size}-temperature" value=""/> °C</li>
-        <li><input name="tuesday-{schedules.holidaySchedules.size + 1}-time" value=""/> : <input name="tuesday-{schedules.holidaySchedules.size + 1}-temperature" value=""/> °C</li>
+        <li><input name="tuesday-{schedules.tuesdaySchedules.size}-time" value=""/> : <input name="tuesday-{schedules.tuesdaySchedules.size}-temperature" value=""/> °C</li>
+        <li><input name="tuesday-{schedules.tuesdaySchedules.size + 1}-time" value=""/> : <input name="tuesday-{schedules.tuesdaySchedules.size + 1}-temperature" value=""/> °C</li>
     </ul>
 
     <h2>Wednesday</h2>
@@ -40,8 +40,8 @@
     {#for transition in schedules.wednesdaySchedules}
         <li><input name="wednesday-{transition_index}-time" value="{transition.time}"/> : <input name="wednesday-{transition_index}-temperature" value="{transition.temperature}"/> °C</li>
     {/for}    
-        <li><input name="wednesday-{schedules.holidaySchedules.size}-time" value=""/> : <input name="wednesday-{schedules.holidaySchedules.size}-temperature" value=""/> °C</li>
-        <li><input name="wednesday-{schedules.holidaySchedules.size + 1}-time" value=""/> : <input name="wednesday-{schedules.holidaySchedules.size + 1}-temperature" value=""/> °C</li>
+        <li><input name="wednesday-{schedules.wednesdaySchedules.size}-time" value=""/> : <input name="wednesday-{schedules.wednesdaySchedules.size}-temperature" value=""/> °C</li>
+        <li><input name="wednesday-{schedules.wednesdaySchedules.size + 1}-time" value=""/> : <input name="wednesday-{schedules.wednesdaySchedules.size + 1}-temperature" value=""/> °C</li>
     </ul> 
 
     <h2>Thursday</h2>
@@ -49,8 +49,8 @@
     {#for transition in schedules.thursdaySchedules}
         <li><input name="thursday-{transition_index}-time" value="{transition.time}"/> : <input name="thursday-{transition_index}-temperature" value="{transition.temperature}"/> °C</li>
     {/for}    
-        <li><input name="thursday-{schedules.holidaySchedules.size}-time" value=""/> : <input name="thursday-{schedules.holidaySchedules.size}-temperature" value=""/> °C</li>
-        <li><input name="thursday-{schedules.holidaySchedules.size + 1}-time" value=""/> : <input name="thursday-{schedules.holidaySchedules.size + 1}-temperature" value=""/> °C</li>
+        <li><input name="thursday-{schedules.thursdaySchedules.size}-time" value=""/> : <input name="thursday-{schedules.thursdaySchedules.size}-temperature" value=""/> °C</li>
+        <li><input name="thursday-{schedules.thursdaySchedules.size + 1}-time" value=""/> : <input name="thursday-{schedules.thursdaySchedules.size + 1}-temperature" value=""/> °C</li>
     </ul> 
 
     <h2>Friday</h2>
@@ -58,8 +58,8 @@
     {#for transition in schedules.fridaySchedules}
         <li><input name="friday-{transition_index}-time" value="{transition.time}"/> : <input name="friday-{transition_index}-temperature" value="{transition.temperature}"/> °C</li>
     {/for}    
-        <li><input name="friday-{schedules.holidaySchedules.size}-time" value=""/> : <input name="friday-{schedules.holidaySchedules.size}-temperature" value=""/> °C</li>
-        <li><input name="friday-{schedules.holidaySchedules.size + 1}-time" value=""/> : <input name="friday-{schedules.holidaySchedules.size + 1}-temperature" value=""/> °C</li>
+        <li><input name="friday-{schedules.fridaySchedules.size}-time" value=""/> : <input name="friday-{schedules.fridaySchedules.size}-temperature" value=""/> °C</li>
+        <li><input name="friday-{schedules.fridaySchedules.size + 1}-time" value=""/> : <input name="friday-{schedules.fridaySchedules.size + 1}-temperature" value=""/> °C</li>
     </ul>   
 
     <h2>Saturday</h2>
@@ -67,8 +67,8 @@
     {#for transition in schedules.saturdaySchedules}
         <li><input name="saturday-{transition_index}-time" value="{transition.time}"/> : <input name="saturday-{transition_index}-temperature" value="{transition.temperature}"/> °C</li>
     {/for}    
-        <li><input name="saturday-{schedules.holidaySchedules.size}-time" value=""/> : <input name="saturday-{schedules.holidaySchedules.size}-temperature" value=""/> °C</li>
-        <li><input name="saturday-{schedules.holidaySchedules.size + 1}-time" value=""/> : <input name="saturday-{schedules.holidaySchedules.size + 1}-temperature" value=""/> °C</li>
+        <li><input name="saturday-{schedules.saturdaySchedules.size}-time" value=""/> : <input name="saturday-{schedules.saturdaySchedules.size}-temperature" value=""/> °C</li>
+        <li><input name="saturday-{schedules.saturdaySchedules.size + 1}-time" value=""/> : <input name="saturday-{schedules.saturdaySchedules.size + 1}-temperature" value=""/> °C</li>
     </ul>
 
     <h2>Sunday</h2>
@@ -76,8 +76,8 @@
     {#for transition in schedules.sundaySchedules}
         <li><input name="sunday-{transition_index}-time" value="{transition.time}"/> : <input name="sunday-{transition_index}-temperature" value="{transition.temperature}"/> °C</li>
     {/for}    
-        <li><input name="sunday-{schedules.holidaySchedules.size}-time" value=""/> : <input name="sunday-{schedules.holidaySchedules.size}-temperature" value=""/> °C</li>
-        <li><input name="sunday-{schedules.holidaySchedules.size + 1}-time" value=""/> : <input name="sunday-{schedules.holidaySchedules.size + 1}-temperature" value=""/> °C</li>
+        <li><input name="sunday-{schedules.sundaySchedules.size}-time" value=""/> : <input name="sunday-{schedules.sundaySchedules.size}-temperature" value=""/> °C</li>
+        <li><input name="sunday-{schedules.sundaySchedules.size + 1}-time" value=""/> : <input name="sunday-{schedules.sundaySchedules.size + 1}-temperature" value=""/> °C</li>
     </ul>  
 
     <br>
