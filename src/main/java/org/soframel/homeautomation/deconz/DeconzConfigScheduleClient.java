@@ -1,24 +1,22 @@
 package org.soframel.homeautomation.deconz;
 
-import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.glassfish.jersey.client.ClientConfig;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.soframel.homeautomation.deconz.dto.Sensor;
 import org.soframel.homeautomation.deconz.dto.Transition;
 import org.soframel.homeautomation.deconz.model.DaysOfWeekSchedule;
 import org.soframel.homeautomation.deconz.model.TransitionModel;
-
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.client.Invocation;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 /**
  * REST client class
@@ -31,7 +29,7 @@ public class DeconzConfigScheduleClient {
         this.sensorURL = apiUrl +"/api/" + apiKey + "/sensors/" + sensorId;
         System.out.println("DeconzConfigScheduleClient, sensor URL=" + sensorURL);
 
-        Client client = ClientBuilder.newClient( new ClientConfig());
+        ResteasyClient client = (ResteasyClient)ClientBuilder.newClient();
         webTarget = client.target(sensorURL);
     }
 
@@ -57,12 +55,13 @@ public class DeconzConfigScheduleClient {
 
     public void deleteSchedule(DaysOfWeekSchedule schedule){
             String bitmap=schedule.toBitmapString();
-            Response r=webTarget.path(bitmap).request().delete();
+            Response r=webTarget.path("/config/schedule/"+bitmap).request().delete();
             if(r.getStatus()==200){
                 System.out.println("Deleted schedule "+bitmap);
             }
             else{
-                System.out.println("An error occured while deleting "+bitmap+": "+r);
+                
+                System.out.println("An error occured while deleting "+bitmap+": "+r.getStatus()+", "+r.readEntity(String.class));
             }
     }
 

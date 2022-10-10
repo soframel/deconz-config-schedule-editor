@@ -17,7 +17,8 @@ import org.soframel.homeautomation.deconz.model.TransitionModel;
  * url (http://deconzHost:deconzPort)
  * key (your API Key)
  * sensorId
- * then call with either no parameters (will print existing schedules), or "delete" to delete all, and/or "create" to (re-)create the schedules.
+ * then call with either no parameters (will print existing schedules), or "delete" to delete all, and/or "create" to (re-)create the schedules:
+ * mvn org.codehaus.mojo:exec-maven-plugin:java (adapt arguments in the pom.xml, maven-exec-plugin)
  */
 public class DeconzConfigScheduleEditorMain {
 

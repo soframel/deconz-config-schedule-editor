@@ -38,20 +38,13 @@
   <dependencies>
 
     <dependency>
-      <groupId>org.glassfish.jersey.core</groupId>
-      <artifactId>jersey-client</artifactId>
-      <version>3.0.8</version>
-    </dependency>
-    <dependency>
-      <groupId>org.glassfish.jersey.inject</groupId>
-      <artifactId>jersey-hk2</artifactId>
-      <version>3.0.8</version>
-    </dependency>
-    <dependency>
-      <groupId>org.glassfish.jersey.media</groupId>
-      <artifactId>jersey-media-json-jackson</artifactId>
-      <version>3.0.8</version>
-    </dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-rest-client</artifactId>
+  </dependency>
+  <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-rest-client-jackson</artifactId>
+  </dependency>
 
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -106,6 +99,10 @@
         </executions>
         <configuration>
           <mainClass>org.soframel.homeautomation.deconz.DeconzConfigScheduleEditorMain</mainClass>
+          <arguments>
+            <argument>delete</argument>
+            <argument>create</argument>
+          </arguments>
         </configuration>
       </plugin>
 
