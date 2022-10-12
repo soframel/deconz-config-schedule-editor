@@ -68,7 +68,7 @@ public class DeconzConfigScheduleResource {
             }
         }
         //then filter out all TransitionModel with no temperature=deletes
-        //schedule.filterOutEmptyTemperatures();
+        schedule.filterOutEmptyTemperatures();
 
         // TODO: save thermostat schedule
         return Templates.schedules(thermostat, schedule);
@@ -87,7 +87,7 @@ public class DeconzConfigScheduleResource {
             }
             String nextToken=tokenizer.nextToken();
             boolean isTime = (nextToken.equals("time"));
-            boolean isDelete = (nextToken.equals("time"));
+            boolean isDelete = (nextToken.equals("delete"));
 
             TransitionModel trans = switch (day) {
                 case "holidays" -> this.getOrCreateTransition(schedule.getHolidaySchedules(), index);
@@ -109,7 +109,11 @@ public class DeconzConfigScheduleResource {
                 } catch (DateTimeParseException e) {
                     throw new SchedulerException("Could not parse time for entry " + key + ", time=" + data);
                 }
-            } else if (!isDelete) { // temperature
+            } 
+            else if(isDelete){
+                trans.setTemperature(-1);
+            }
+            else { // temperature
                 try {
                     int temp = Integer.parseInt(data);
                     trans.setTemperature(temp);
@@ -118,6 +122,7 @@ public class DeconzConfigScheduleResource {
                             "Could not parse temperature for entry " + key + ", temperature=" + data);
                 }
             }
+            
         }
     }
 

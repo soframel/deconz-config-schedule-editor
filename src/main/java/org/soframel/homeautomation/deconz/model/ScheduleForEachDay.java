@@ -3,6 +3,7 @@ package org.soframel.homeautomation.deconz.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 /**
  * List for each day (starting with 0 = holidays, 1=monday....7=sunday) of the transition models
  */
@@ -88,30 +89,13 @@ public class ScheduleForEachDay {
         return result;
     }   
     
-    public void filterOutEmptyTemperatures(){
-        this.getHolidaySchedules().stream().filter((TransitionModel tr)-> {
-            return tr.temperature>0;
-        });
-        this.getMondaySchedules().stream().filter((TransitionModel tr)-> {
-            return tr.temperature>0;
-        });
-        this.getTuesdaySchedules().stream().filter((TransitionModel tr)-> {
-            return tr.temperature>0;
-        });
-        this.getWednesdaySchedules().stream().filter((TransitionModel tr)-> {
-            return tr.temperature>0;
-        });
-        this.getThursdaySchedules().stream().filter((TransitionModel tr)-> {
-            return tr.temperature>0;
-        });
-        this.getFridaySchedules().stream().filter((TransitionModel tr)-> {
-            return tr.temperature>0;
-        });
-        this.getSaturdaySchedules().stream().filter((TransitionModel tr)-> {
-            return tr.temperature>0;
-        });
-        this.getSundaySchedules().stream().filter((TransitionModel tr)-> {
-            return tr.temperature>0;
-        });
+    /**
+     * remove all entries for all days of week with temperature<=0
+     */
+    public void filterOutEmptyTemperatures(){        
+        schedules=schedules.stream().map((List<TransitionModel> list) -> {
+            return list.stream().filter((TransitionModel tr)-> {return tr.temperature>0;})
+            .collect(Collectors.toList());
+        }).collect(Collectors.toList());
     }
 }
