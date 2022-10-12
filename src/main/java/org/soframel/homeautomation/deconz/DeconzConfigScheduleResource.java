@@ -16,8 +16,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 import org.soframel.homeautomation.deconz.model.DaysOfWeekSchedule;
 import org.soframel.homeautomation.deconz.model.ScheduleForEachDay;
@@ -51,28 +53,34 @@ public class DeconzConfigScheduleResource {
         ScheduleForEachDay schedule = new ScheduleForEachDay();
 
         for (String key : form.keySet()) {
-            List<String> dataList = form.get(key);
-            // we only have one data per key in our case
-            if (dataList.size() > 0) {
-                String data = dataList.get(0);
-                this.addDataToSchedule(schedule, key, data);
-            }
+                List<String> dataList = form.get(key);
+                // we only have one data per key in our case
+                if (dataList.size() > 0) {
+                    String data = dataList.get(0);
+                    this.addDataToSchedule(schedule, key, data);
+                }
         }
+        //then filter out all TransitionModel with no temperature=deletes
+        //schedule.filterOutEmptyTemperatures();
+
         // TODO: save thermostat schedule
         return Templates.schedules(thermostat, schedule);
     }
 
     private void addDataToSchedule(ScheduleForEachDay schedule, String key, String data) throws SchedulerException {
         if (data != null && !data.equals("")) {
+            logger.info("parsing param "+key+", data="+data);
             StringTokenizer tokenizer = new StringTokenizer(key, "-", false);
             String day = tokenizer.nextToken();
-            int index=-1;
-            try{
+            int index = -1;
+            try {
                 index = Integer.parseInt(tokenizer.nextToken());
-            } catch(NumberFormatException e){
-                throw new SchedulerException("Could not parse entry index in "+key);
+            } catch (NumberFormatException e) {
+                throw new SchedulerException("Could not parse entry index in " + key);
             }
-            boolean isTime = (tokenizer.nextToken().equals("time"));
+            String nextToken=tokenizer.nextToken();
+            boolean isTime = (nextToken.equals("time"));
+            boolean isDelete = (nextToken.equals("time"));
 
             TransitionModel trans = switch (day) {
                 case "holidays" -> this.getOrCreateTransition(schedule.getHolidaySchedules(), index);
@@ -88,22 +96,21 @@ public class DeconzConfigScheduleResource {
 
             if (isTime) {
                 // parse value
-                try{
+                try {
                     LocalTime time = LocalTime.parse(data);
                     trans.setTime(time);
-                } catch(DateTimeParseException e){
-                    throw new SchedulerException("Could not parse time for entry "+key+", time="+data);
-                }                
-            } else { // temperature
-                try{
-                int temp = Integer.parseInt(data);
-                trans.setTemperature(temp);
-                }catch(NumberFormatException e){
-                    throw new SchedulerException("Could not parse temperature for entry "+key+", temperature="+data);
+                } catch (DateTimeParseException e) {
+                    throw new SchedulerException("Could not parse time for entry " + key + ", time=" + data);
+                }
+            } else if (!isDelete) { // temperature
+                try {
+                    int temp = Integer.parseInt(data);
+                    trans.setTemperature(temp);
+                } catch (NumberFormatException e) {
+                    throw new SchedulerException(
+                            "Could not parse temperature for entry " + key + ", temperature=" + data);
                 }
             }
-        }else{
-            //TODO: manage deleted entries
         }
     }
 
@@ -111,7 +118,7 @@ public class DeconzConfigScheduleResource {
         if (list.size() > index) {
             return list.get(index);
         } else {
-            while(list.size()<index+1){
+            while (list.size() < index + 1) {
                 list.add(new TransitionModel());
             }
             return list.get(index);

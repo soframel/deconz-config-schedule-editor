@@ -86,5 +86,32 @@ public class ScheduleForEachDay {
         }
         result.orderTransitions();
         return result;
-    }    
+    }   
+    
+    public void filterOutEmptyTemperatures(){
+        this.getHolidaySchedules().stream().filter((TransitionModel tr)-> {
+            return tr.temperature>0;
+        });
+        this.getMondaySchedules().stream().filter((TransitionModel tr)-> {
+            return tr.temperature>0;
+        });
+        this.getTuesdaySchedules().stream().filter((TransitionModel tr)-> {
+            return tr.temperature>0;
+        });
+        this.getWednesdaySchedules().stream().filter((TransitionModel tr)-> {
+            return tr.temperature>0;
+        });
+        this.getThursdaySchedules().stream().filter((TransitionModel tr)-> {
+            return tr.temperature>0;
+        });
+        this.getFridaySchedules().stream().filter((TransitionModel tr)-> {
+            return tr.temperature>0;
+        });
+        this.getSaturdaySchedules().stream().filter((TransitionModel tr)-> {
+            return tr.temperature>0;
+        });
+        this.getSundaySchedules().stream().filter((TransitionModel tr)-> {
+            return tr.temperature>0;
+        });
+    }
 }
