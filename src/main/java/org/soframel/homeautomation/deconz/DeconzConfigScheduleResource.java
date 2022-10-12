@@ -11,6 +11,7 @@ import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -47,18 +48,24 @@ public class DeconzConfigScheduleResource {
 
     @POST
     @Produces(MediaType.TEXT_HTML)
-    public TemplateInstance saveSchedule(@QueryParam("thermostat") String thermostat,
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public TemplateInstance saveSchedule(
             MultivaluedMap<String, String> form) throws SchedulerException {
         logger.info("saving schedule: " + form);
         ScheduleForEachDay schedule = new ScheduleForEachDay();
-
+        String thermostat="";
         for (String key : form.keySet()) {
+            if("thermostat".equals(key)){
+                thermostat=form.getFirst(key);
+            }
+            else{
                 List<String> dataList = form.get(key);
                 // we only have one data per key in our case
                 if (dataList.size() > 0) {
                     String data = dataList.get(0);
                     this.addDataToSchedule(schedule, key, data);
                 }
+            }
         }
         //then filter out all TransitionModel with no temperature=deletes
         //schedule.filterOutEmptyTemperatures();
