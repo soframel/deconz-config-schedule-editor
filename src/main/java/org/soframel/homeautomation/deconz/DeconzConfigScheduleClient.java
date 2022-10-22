@@ -29,6 +29,7 @@ import org.soframel.homeautomation.deconz.model.TransitionModel;
 public class DeconzConfigScheduleClient {
     private static Logger logger = Logger.getLogger(DeconzConfigScheduleClient.class.getName());
 
+    private ResteasyClient client;
     private String sensorURL;
     WebTarget webTarget;
 
@@ -41,8 +42,12 @@ public class DeconzConfigScheduleClient {
         this.sensorURL = apiUrl + "/api/" + apiKey + "/sensors/";
         logger.info("DeconzConfigScheduleClient, sensor URL=" + sensorURL);
 
-        ResteasyClient client = (ResteasyClient) ClientBuilder.newClient();
+        client = (ResteasyClient) ClientBuilder.newClient();
         webTarget = client.target(sensorURL);
+    }
+
+    public void close(){
+        client.close();
     }
 
     public Map<DaysOfWeekSchedule, List<TransitionModel>> getAllSchedules(String sensorId) {

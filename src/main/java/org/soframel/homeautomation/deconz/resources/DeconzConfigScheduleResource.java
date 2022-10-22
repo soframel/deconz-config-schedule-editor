@@ -8,8 +8,10 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -18,6 +20,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.soframel.homeautomation.deconz.DeconzConfigScheduleClient;
 import org.soframel.homeautomation.deconz.SchedulerException;
 import org.soframel.homeautomation.deconz.model.DaysOfWeekSchedule;
@@ -27,25 +30,31 @@ import org.soframel.homeautomation.deconz.model.TransitionModel;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
 
-@Path("/schedules")
+@Path("/")
+@ApplicationScoped
 public class DeconzConfigScheduleResource {
     private static Logger logger = Logger.getLogger(DeconzConfigScheduleResource.class.getName());
+
+    @ConfigProperty(name = "thermostats") 
+    Map<String,String> thermostats;
 
     @Inject
     DeconzConfigScheduleClient client;
 
     @CheckedTemplate
     public static class Templates {
-        public static native TemplateInstance schedules(String thermostat, String name, ScheduleForEachDay schedules);
+        public static native TemplateInstance schedules(Map<String,String> thermostats, String name, ScheduleForEachDay schedules);
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public TemplateInstance get(@QueryParam("thermostat") String thermostat,@QueryParam("name") String name) {
-
-        Map<DaysOfWeekSchedule, List<TransitionModel>> data =client.getAllSchedules(thermostat);
-
-        return Templates.schedules(thermostat,name, ScheduleForEachDay.parseFromScheduleMap(data));
+    public TemplateInstance get(@DefaultValue("") @QueryParam("name") String name) {
+        ScheduleForEachDay schedules=null;
+        if(name!=null && !name.equals("")){
+            Map<DaysOfWeekSchedule, List<TransitionModel>> data =client.getAllSchedules(thermostats.get(name));
+            schedules=ScheduleForEachDay.parseFromScheduleMap(data);
+        }
+        return Templates.schedules(thermostats,name,schedules);        
     }
 
     @POST
@@ -59,11 +68,9 @@ public class DeconzConfigScheduleResource {
         String thermostat="";
         String name="";
         for (String key : form.keySet()) {
-            if("thermostat".equals(key)){
-                thermostat=form.getFirst(key);
-            }
-            else if("name".equals(key)){
+            if("name".equals(key)){
                 name=form.getFirst(key);
+                thermostat=thermostats.get(name);
             }
             else{
                 List<String> dataList = form.get(key);
@@ -86,7 +93,7 @@ public class DeconzConfigScheduleResource {
         logger.info("schedules saved for thermostat "+thermostat);
 
         //return page
-        return Templates.schedules(thermostat, name, schedule);
+        return Templates.schedules(thermostats, name, schedule);
     }
 
     private void addDataToSchedule(ScheduleForEachDay schedule, String key, String data) throws SchedulerException {
