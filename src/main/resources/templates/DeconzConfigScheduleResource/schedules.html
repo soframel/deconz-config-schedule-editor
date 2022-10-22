@@ -3,12 +3,13 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Schedules for thermostat {thermostat}</title> 
+<title>Schedules for thermostat {name}</title> 
 </head>
 <body>
-    <h1>Weekly Schedules for Thermostat {thermostat}</h1>
-    <form action="/" method="POST">
+    <h1>Weekly Schedules for Thermostat {name}</h1>
+    <form action="/schedules" method="POST">
     <input type="hidden" name="thermostat" value="{thermostat}"/>
+    <input type="hidden" name="name" value="{name}"/>
     <h2>Holidays</h2>
     <table>
         <thead><td>Time (HH:MM)</td><td>Temperature (°C)</td><td>Delete?</td></thead>

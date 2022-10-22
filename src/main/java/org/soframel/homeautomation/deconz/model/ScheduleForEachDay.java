@@ -1,6 +1,7 @@
 package org.soframel.homeautomation.deconz.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -89,6 +90,48 @@ public class ScheduleForEachDay {
         return result;
     }   
     
+    public DaysOfWeekSchedule getDayOfWeekSchedule(int index){        
+            if(index==0){
+                return new DaysOfWeekSchedule(true);
+            }
+            else if(index==1){
+                return new DaysOfWeekSchedule(true, false, false, false, false, false, false);
+            }
+            else if(index==2){
+                return new DaysOfWeekSchedule(false, true, false, false, false, false, false);
+            }
+            else if(index==3){
+                return new DaysOfWeekSchedule(false, false, true, false, false, false, false);
+            }
+            else if(index==4){
+                return new DaysOfWeekSchedule(false, false, false, true, false, false, false);
+            }
+            else if(index==5){
+                return new DaysOfWeekSchedule(false, false, false, false, true, false, false);
+            }
+            else if(index==6){
+                return new DaysOfWeekSchedule(false, false, false, false, false, true, false);
+            }
+            else if(index==7){
+                return new DaysOfWeekSchedule(false, false, false, false, false, false, true);
+            }   
+            else{
+                throw new IllegalArgumentException("invalid index for schedule in ScheduleForEachDay: "+index);
+            }
+    }
+
+    public Map<DaysOfWeekSchedule, List<TransitionModel>> getDayOfWeekSchedules(){
+        Map<DaysOfWeekSchedule, List<TransitionModel>> map=new HashMap<DaysOfWeekSchedule, List<TransitionModel>>();
+
+        for(int i=0; i<schedules.size();i++){
+            DaysOfWeekSchedule schedule=this.getDayOfWeekSchedule(i);
+            List<TransitionModel> transitions=schedules.get(i);
+            map.put(schedule, transitions);
+        }
+
+        return map;
+    }
+
     /**
      * remove all entries for all days of week with temperature<=0
      */

@@ -1,9 +1,7 @@
-package org.soframel.homeautomation.deconz;
+package org.soframel.homeautomation.deconz.resources;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,35 +13,39 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
 
+import org.soframel.homeautomation.deconz.DeconzConfigScheduleClient;
+import org.soframel.homeautomation.deconz.SchedulerException;
 import org.soframel.homeautomation.deconz.model.DaysOfWeekSchedule;
 import org.soframel.homeautomation.deconz.model.ScheduleForEachDay;
 import org.soframel.homeautomation.deconz.model.TransitionModel;
 
-import io.quarkus.qute.TemplateInstance;
 import io.quarkus.qute.CheckedTemplate;
+import io.quarkus.qute.TemplateInstance;
 
-@Path("/")
+@Path("/schedules")
 public class DeconzConfigScheduleResource {
     private static Logger logger = Logger.getLogger(DeconzConfigScheduleResource.class.getName());
 
+    @Inject
+    DeconzConfigScheduleClient client;
+
     @CheckedTemplate
     public static class Templates {
-        public static native TemplateInstance schedules(String thermostat, ScheduleForEachDay schedules);
+        public static native TemplateInstance schedules(String thermostat, String name, ScheduleForEachDay schedules);
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public TemplateInstance get(@QueryParam("thermostat") String thermostat) {
-        Map<DaysOfWeekSchedule, List<TransitionModel>> data = this.getTestData();
+    public TemplateInstance get(@QueryParam("thermostat") String thermostat,@QueryParam("name") String name) {
 
-        return Templates.schedules(thermostat, ScheduleForEachDay.parseFromScheduleMap(data));
+        Map<DaysOfWeekSchedule, List<TransitionModel>> data =client.getAllSchedules(thermostat);
+
+        return Templates.schedules(thermostat,name, ScheduleForEachDay.parseFromScheduleMap(data));
     }
 
     @POST
@@ -52,11 +54,16 @@ public class DeconzConfigScheduleResource {
     public TemplateInstance saveSchedule(
             MultivaluedMap<String, String> form) throws SchedulerException {
         logger.info("saving schedule: " + form);
+        //Transform schedule data
         ScheduleForEachDay schedule = new ScheduleForEachDay();
         String thermostat="";
+        String name="";
         for (String key : form.keySet()) {
             if("thermostat".equals(key)){
                 thermostat=form.getFirst(key);
+            }
+            else if("name".equals(key)){
+                name=form.getFirst(key);
             }
             else{
                 List<String> dataList = form.get(key);
@@ -70,8 +77,16 @@ public class DeconzConfigScheduleResource {
         //then filter out all TransitionModel with no temperature=deletes
         schedule.filterOutEmptyTemperatures();
 
-        // TODO: save thermostat schedule
-        return Templates.schedules(thermostat, schedule);
+        // save thermostat schedule
+        client.deleteAllSchedules(thermostat);
+        Map<DaysOfWeekSchedule, List<TransitionModel>> formattedSchedules=schedule.getDayOfWeekSchedules();
+        for(DaysOfWeekSchedule s: formattedSchedules.keySet()){
+            client.createSchedule(thermostat, s, formattedSchedules.get(s).toArray(new TransitionModel[0]));
+        }
+        logger.info("schedules saved for thermostat "+thermostat);
+
+        //return page
+        return Templates.schedules(thermostat, name, schedule);
     }
 
     private void addDataToSchedule(ScheduleForEachDay schedule, String key, String data) throws SchedulerException {
@@ -113,7 +128,7 @@ public class DeconzConfigScheduleResource {
             else if(isDelete){
                 trans.setTemperature(-1);
             }
-            else { // temperature
+            else if(trans.getTemperature()>-1) { // temperature, only if -1 not already set (otherwise another form entry had a "delete")
                 try {
                     int temp = Integer.parseInt(data);
                     trans.setTemperature(temp);
@@ -138,7 +153,7 @@ public class DeconzConfigScheduleResource {
     }
 
     // to be replaced by REST calls
-    private Map<DaysOfWeekSchedule, List<TransitionModel>> getTestData() {
+    /*private Map<DaysOfWeekSchedule, List<TransitionModel>> getTestData() {
         Map<DaysOfWeekSchedule, List<TransitionModel>> map = new HashMap<>();
 
         DaysOfWeekSchedule s = new DaysOfWeekSchedule(true, false, false, false, true, false, false);
@@ -157,5 +172,5 @@ public class DeconzConfigScheduleResource {
         map.put(s3, List.of(t5, t6));
 
         return map;
-    }
+    }*/
 }

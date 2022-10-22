@@ -18,20 +18,20 @@ import org.soframel.homeautomation.deconz.model.TransitionModel;
  * key (your API Key)
  * sensorId
  * then call with either no parameters (will print existing schedules), or "delete" to delete all, and/or "create" to (re-)create the schedules:
- * mvn org.codehaus.mojo:exec-maven-plugin:java (adapt arguments in the pom.xml, maven-exec-plugin)
+ * mvn org.codehaus.mojo:exec-maven-plugin:java (adapt action arguments in the pom.xml, maven-exec-plugin, to only delete or create if needed)
  */
 public class DeconzConfigScheduleEditorMain {
 
     public static void main(String[] args) {
-        try (FileReader reader = new FileReader("local.properties")) {
+        try (FileReader reader = new FileReader(".env")) {
             Properties props = new Properties();
             props.load(reader);
-            String url = props.getProperty("url");
-            String key = props.getProperty("key");
-            String sensorId = props.getProperty("sensorid");
+            String url = props.getProperty("URL");
+            String key = props.getProperty("KEY");
+            String sensorId = props.getProperty("SENSORID");
 
-            DeconzConfigScheduleClient client = new DeconzConfigScheduleClient(url, key, sensorId);
-            DeconzConfigScheduleEditorMain editor = new DeconzConfigScheduleEditorMain(client);            
+            DeconzConfigScheduleClient client = new DeconzConfigScheduleClient(url, key);
+            DeconzConfigScheduleEditorMain editor = new DeconzConfigScheduleEditorMain(client, sensorId);            
             editor.printAllSchedules();
 
             List<String> argsList=Arrays.asList(args);
@@ -44,20 +44,22 @@ public class DeconzConfigScheduleEditorMain {
                 editor.createWeekSchedules();
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println("an exception occured: "+e.getMessage());
             e.printStackTrace();
         }
     }
 
     DeconzConfigScheduleClient client;
+    String sensorId;
 
-    public DeconzConfigScheduleEditorMain(DeconzConfigScheduleClient client) {
+    public DeconzConfigScheduleEditorMain(DeconzConfigScheduleClient client, String sensorId) {
         this.client = client;
+        this.sensorId=sensorId;
     }
 
     public void printAllSchedules() {
-        Map<DaysOfWeekSchedule, List<TransitionModel>> schedules = client.getAllSchedules();
+        Map<DaysOfWeekSchedule, List<TransitionModel>> schedules = client.getAllSchedules(sensorId);
         for (DaysOfWeekSchedule schedule : schedules.keySet()) {
             System.out.println("For schedule=" + schedule);
             for(TransitionModel tr: schedules.get(schedule)){
@@ -66,27 +68,24 @@ public class DeconzConfigScheduleEditorMain {
         }
     }
 
-    public void deleteAllSchedules() {
-        Map<DaysOfWeekSchedule, List<TransitionModel>> schedules = client.getAllSchedules();
-        for (DaysOfWeekSchedule schedule : schedules.keySet()) {
-            System.out.println("deleting schedule=" + schedule);
-            client.deleteSchedule(schedule);
-        }
+    public void deleteAllSchedules() throws SchedulerException {
+        client.deleteAllSchedules(sensorId);
     }
 
     /**
      * Schedules to be created
+     * @throws SchedulerException
      */
-    public void createWeekSchedules() {
+    public void createWeekSchedules() throws SchedulerException {
         DaysOfWeekSchedule scheduleSemaine = new DaysOfWeekSchedule(true, true, true, true, true, false, false);
         TransitionModel matinSemaine = new TransitionModel(LocalTime.of(7, 00), 1700);
         TransitionModel soirSemaine = new TransitionModel(LocalTime.of(21, 00), 1800);
-        client.createSchedule(scheduleSemaine, matinSemaine, soirSemaine);
+        client.createSchedule(sensorId, scheduleSemaine, matinSemaine, soirSemaine);
 
         DaysOfWeekSchedule scheduleWE = new DaysOfWeekSchedule(false, false, false, false, false, true, true);
         TransitionModel matinWE = new TransitionModel(LocalTime.of(9, 00), 1700);
         TransitionModel soirWE = new TransitionModel(LocalTime.of(21, 00), 1800);
-        client.createSchedule(scheduleWE, matinWE, soirWE);
+        client.createSchedule(sensorId, scheduleWE, matinWE, soirWE);
     }
 
 }
