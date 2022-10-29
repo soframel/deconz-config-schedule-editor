@@ -21,7 +21,7 @@
 <!--thermostat schedules for all days of week -->
 
 <br/>
-    <h2>Thermostat "{thermostats.get(id)}"</h2>
+    <h2>{thermostats.get(id)}</h2>
     <br/>
     <form action="/" method="POST">
     <input type="hidden" name="id" value="{id}"/>    
@@ -31,21 +31,21 @@
     <div class="col">
 
     <h3>Monday</h3>
-    <table>
-        <thead><td>Time (HH:MM)</td><td>Temperature (°C)</td><td>Delete?</td></thead>
+    <table class="table table-sm table-primary">
+        <thead><tr><th>Time (HH:MM)</th><th>Temperature (°C)</th><th>Delete?</th></tr></thead>
     {#for transition in schedules.mondaySchedules}
         <tr><td><input name="monday-{transition_index}-time" value="{transition.time}"/></td><td><input name="monday-{transition_index}-temperature" value="{transition.temperature}"/></td><td><input type="checkbox" name="monday-{transition_index}-delete" value="true"></td></tr>
     {/for}    
-        <tr><td><input name="monday-{schedules.mondaySchedules.size}-time" value=""/></td><td><input name="monday-{schedules.mondaySchedules.size}-temperature" value=""/></td><td></td><td></td></tr>
-        <tr><td><input name="monday-{schedules.mondaySchedules.size + 1}-time" value=""/></td><td><input name="monday-{schedules.mondaySchedules.size + 1}-temperature" value=""/></td><td></td><td></td></tr>
+        <tr><td><input name="monday-{schedules.mondaySchedules.size}-time" value=""/></td><td><input name="monday-{schedules.mondaySchedules.size}-temperature" value=""/></td><td></td></tr>
+        <tr><td><input name="monday-{schedules.mondaySchedules.size + 1}-time" value=""/></td><td><input name="monday-{schedules.mondaySchedules.size + 1}-temperature" value=""/></td><td></td></tr>
     </table>
 
     </div>
     <div class="col">
 
     <h3>Tuesday</h3>
-    <table>
-        <thead><td>Time (HH:MM)</td><td>Temperature (°C)</td><td>Delete?</td></thead>
+    <table class="table table-sm table-secondary">
+        <thead><tr><th>Time (HH:MM)</th><th>Temperature (°C)</th><th>Delete?</th></tr></thead>
     {#for transition in schedules.tuesdaySchedules}
         <tr><td><input name="tuesday-{transition_index}-time" value="{transition.time}"/></td><td><input name="tuesday-{transition_index}-temperature" value="{transition.temperature}"/></td><td><input type="checkbox" name="tuesday-{transition_index}-delete" value="true"></td></tr>
     {/for}    
@@ -59,8 +59,8 @@
     <div class="col">
 
     <h3>Wednesday</h3>
-    <table>
-        <thead><td>Time (HH:MM)</td><td>Temperature (°C)</td><td>Delete?</td></thead>
+    <table class="table table-sm table-secondary">
+        <thead><tr><th>Time (HH:MM)</th><th>Temperature (°C)</th><th>Delete?</th></tr></thead>
     {#for transition in schedules.wednesdaySchedules}
         <tr><td><input name="wednesday-{transition_index}-time" value="{transition.time}"/></td><td><input name="wednesday-{transition_index}-temperature" value="{transition.temperature}"/></td><td><input type="checkbox" name="wednesday-{transition_index}-delete" value="true"></td></tr>
     {/for}    
@@ -72,8 +72,8 @@
     <div class="col">
 
     <h3>Thursday</h3>
-    <table>
-        <thead><td>Time (HH:MM)</td><td>Temperature (°C)</td><td>Delete?</td></thead>
+    <table class="table table-sm  table-primary">
+        <thead><tr><th>Time (HH:MM)</th><th>Temperature (°C)</th><th>Delete?</th></tr></thead>
     {#for transition in schedules.thursdaySchedules}
         <tr><td><input name="thursday-{transition_index}-time" value="{transition.time}"/></td><td><input name="thursday-{transition_index}-temperature" value="{transition.temperature}"/></td><td><input type="checkbox" name="thursday-{transition_index}-delete" value="true"></td></tr>
     {/for}    
@@ -87,8 +87,8 @@
     <div class="col">
 
     <h3>Friday</h3>
-    <table>
-        <thead><td>Time (HH:MM)</td><td>Temperature (°C)</td><td>Delete?</td></thead>
+    <table class="table table-sm table-primary">
+        <thead><tr><th>Time (HH:MM)</th><th>Temperature (°C)</th><th>Delete?</th></tr></thead>
     {#for transition in schedules.fridaySchedules}
         <tr><td><input name="friday-{transition_index}-time" value="{transition.time}"/></td><td><input name="friday-{transition_index}-temperature" value="{transition.temperature}"/></td><td><input type="checkbox" name="friday-{transition_index}-delete" value="true"></td></tr>
     {/for}    
@@ -100,8 +100,8 @@
     <div class="col">
 
     <h3>Saturday</h3>
-    <table>
-        <thead><td>Time (HH:MM)</td><td>Temperature (°C)</td><td>Delete?</td></thead>
+    <table class="table table-sm table-secondary">
+        <thead><tr><th>Time (HH:MM)</th><th>Temperature (°C)</th><th>Delete?</th></tr></thead>
     {#for transition in schedules.saturdaySchedules}
         <tr><td><input name="saturday-{transition_index}-time" value="{transition.time}"/></td><td><input name="saturday-{transition_index}-temperature" value="{transition.temperature}"/></td><td><input type="checkbox" name="saturday-{transition_index}-delete" value="true"></td></tr>
     {/for}    
@@ -115,8 +115,8 @@
     <div class="col">
 
     <h3>Sunday</h3>
-    <table>
-        <thead><td>Time (HH:MM)</td><td>Temperature (°C)</td><td>Delete?</td></thead>
+    <table class="table table-sm table-secondary">
+        <thead><tr><th>Time (HH:MM)</th><th>Temperature (°C)</th><th>Delete?</th></tr></thead>
     {#for transition in schedules.sundaySchedules}
         <tr><td><input name="sunday-{transition_index}-time" value="{transition.time}"/></td><td><input name="sunday-{transition_index}-temperature" value="{transition.temperature}"/></td><td><input type="checkbox" name="sunday-{transition_index}-delete" value="true"></td></tr>
     {/for}    
@@ -128,8 +128,8 @@
     <div class="col">
 
     <h3>Holidays</h3>
-    <table>
-        <thead><td>Time (HH:MM)</td><td>Temperature (°C)</td><td>Delete?</td></thead>
+    <table class="table table-sm  table-primary">
+        <thead><tr><th>Time (HH:MM)</td><td>Temperature (°C)</td><td>Delete?</th></tr></thead>
     {#for transition in schedules.holidaySchedules}
         <tr><td><input name="holidays-{transition_index}-time" value="{transition.time}"/></td><td><input name="holidays-{transition_index}-temperature" value="{transition.temperature}"/></td><td><input type="checkbox" name="holidays-{transition_index}-delete" value="true"></td></tr>
     {/for}    
