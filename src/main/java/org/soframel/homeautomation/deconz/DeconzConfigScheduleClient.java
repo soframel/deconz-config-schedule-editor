@@ -101,7 +101,7 @@ public class DeconzConfigScheduleClient {
                     .map((TransitionModel t) -> {
                         return new Transition(t.getTemperature(), TransitionModel.formatter.format(t.getTime()));
                     })
-                    .toList();
+                    .collect(Collectors.toList());
             Response r = invocationBuilder.post(Entity.entity(list, MediaType.APPLICATION_JSON));
             if (r.getStatus() == 200) {
                 logger.info("Schedule created for " + bitmap);

@@ -35,7 +35,7 @@ import io.quarkus.qute.TemplateInstance;
 public class DeconzConfigScheduleResource {
     private static Logger logger = Logger.getLogger(DeconzConfigScheduleResource.class.getName());
 
-    @ConfigProperty(name = "thermostats") 
+    @ConfigProperty(name = "thermostat") 
     Map<String,String> thermostats;
 
     @Inject
@@ -43,18 +43,18 @@ public class DeconzConfigScheduleResource {
 
     @CheckedTemplate
     public static class Templates {
-        public static native TemplateInstance schedules(Map<String,String> thermostats, String name, ScheduleForEachDay schedules);
+        public static native TemplateInstance schedules(Map<String,String> thermostats, String id, ScheduleForEachDay schedules);
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public TemplateInstance get(@DefaultValue("") @QueryParam("name") String name) {
+    public TemplateInstance get(@DefaultValue("") @QueryParam("id") String sensorid) {
         ScheduleForEachDay schedules=null;
-        if(name!=null && !name.equals("")){
-            Map<DaysOfWeekSchedule, List<TransitionModel>> data =client.getAllSchedules(thermostats.get(name));
+        if(sensorid!=null && !sensorid.equals("")){
+            Map<DaysOfWeekSchedule, List<TransitionModel>> data =client.getAllSchedules(sensorid);
             schedules=ScheduleForEachDay.parseFromScheduleMap(data);
         }
-        return Templates.schedules(thermostats,name,schedules);        
+        return Templates.schedules(thermostats,sensorid, schedules);        
     }
 
     @POST
@@ -66,11 +66,9 @@ public class DeconzConfigScheduleResource {
         //Transform schedule data
         ScheduleForEachDay schedule = new ScheduleForEachDay();
         String thermostat="";
-        String name="";
         for (String key : form.keySet()) {
-            if("name".equals(key)){
-                name=form.getFirst(key);
-                thermostat=thermostats.get(name);
+            if("id".equals(key)){
+                thermostat=form.getFirst(key);
             }
             else{
                 List<String> dataList = form.get(key);
@@ -93,7 +91,7 @@ public class DeconzConfigScheduleResource {
         logger.info("schedules saved for thermostat "+thermostat);
 
         //return page
-        return Templates.schedules(thermostats, name, schedule);
+        return Templates.schedules(thermostats,thermostat, schedule);
     }
 
     private void addDataToSchedule(ScheduleForEachDay schedule, String key, String data) throws SchedulerException {
@@ -111,17 +109,18 @@ public class DeconzConfigScheduleResource {
             boolean isTime = (nextToken.equals("time"));
             boolean isDelete = (nextToken.equals("delete"));
 
-            TransitionModel trans = switch (day) {
-                case "holidays" -> this.getOrCreateTransition(schedule.getHolidaySchedules(), index);
-                case "monday" -> this.getOrCreateTransition(schedule.getMondaySchedules(), index);
-                case "tuesday" -> this.getOrCreateTransition(schedule.getTuesdaySchedules(), index);
-                case "wednesday" -> this.getOrCreateTransition(schedule.getWednesdaySchedules(), index);
-                case "thursday" -> this.getOrCreateTransition(schedule.getThursdaySchedules(), index);
-                case "friday" -> this.getOrCreateTransition(schedule.getFridaySchedules(), index);
-                case "saturday" -> this.getOrCreateTransition(schedule.getSaturdaySchedules(), index);
-                case "sunday" -> this.getOrCreateTransition(schedule.getSundaySchedules(), index);
-                default -> throw new SchedulerException("Unrecognized day in entry " + key);
+            List<TransitionModel> daySchedules=null;
+            if("holidays".equals(day)){daySchedules=schedule.getHolidaySchedules();}
+            else if("monday".equals(day)){daySchedules=schedule.getMondaySchedules();}
+            else if("tuesday".equals(day)){daySchedules=schedule.getTuesdaySchedules();}
+            else if("wednesday".equals(day)){daySchedules=schedule.getWednesdaySchedules();}
+            else if("thursday".equals(day)){daySchedules=schedule.getThursdaySchedules();}
+            else if("friday".equals(day)){daySchedules=schedule.getFridaySchedules();}
+            else if("saturday".equals(day)){daySchedules=schedule.getSaturdaySchedules();}
+            else if("sunday".equals(day)){daySchedules=schedule.getSundaySchedules();}
+            else { throw new SchedulerException("Unrecognized day in entry " + key);
             };
+            TransitionModel trans =  this.getOrCreateTransition(daySchedules, index);
 
             if (isTime) {
                 // parse value

@@ -1,24 +1,36 @@
 {@java.util.Map<String,String> thermostats} 
-{@String name} 
+{@String id} 
 {@org.soframel.homeautomation.deconz.model.ScheduleForEachDay schedules} 
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Schedules for thermostat {name}</title> 
+<title>Thermostats Weekly Schedules</title> 
+<link rel="stylesheet" href="./bootstrap.min.css"/>
+<link rel="stylesheet" href="./app.css"/>
 </head>
 <body>
-    <h1>Thermostats</h1>
+    <h1>Thermostats Weekly Schedules</h1>
+    <ul class="list-group">  
     {#each thermostats}
-        <p><a href="/?name={it.key}">{it.key}</a></p>
+        <li class="list-group-item"><a href="/?id={it.key}">{it.value}</a></li>
     {/each}
+    </ul>
     
-    {#if name}
-    <h2>Weekly Schedules for Thermostat {name}</h2>
-    <form action="/" method="POST">
-    <input type="hidden" name="name" value="{name}"/>    
+    {#if id}
+<!--thermostat schedules for all days of week -->
 
-    <h2>Monday</h2>
+<br/>
+    <h2>Thermostat "{thermostats.get(id)}"</h2>
+    <br/>
+    <form action="/" method="POST">
+    <input type="hidden" name="id" value="{id}"/>    
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col">
+
+    <h3>Monday</h3>
     <table>
         <thead><td>Time (HH:MM)</td><td>Temperature (°C)</td><td>Delete?</td></thead>
     {#for transition in schedules.mondaySchedules}
@@ -28,7 +40,10 @@
         <tr><td><input name="monday-{schedules.mondaySchedules.size + 1}-time" value=""/></td><td><input name="monday-{schedules.mondaySchedules.size + 1}-temperature" value=""/></td><td></td><td></td></tr>
     </table>
 
-    <h2>Tuesday</h2>
+    </div>
+    <div class="col">
+
+    <h3>Tuesday</h3>
     <table>
         <thead><td>Time (HH:MM)</td><td>Temperature (°C)</td><td>Delete?</td></thead>
     {#for transition in schedules.tuesdaySchedules}
@@ -38,7 +53,12 @@
         <tr><td><input name="tuesday-{schedules.tuesdaySchedules.size + 1}-time" value=""/></td><td><input name="tuesday-{schedules.tuesdaySchedules.size + 1}-temperature" value=""/></td><td></td></tr>
     </table>
 
-    <h2>Wednesday</h2>
+    </div>
+    </div>
+    <div class="row">
+    <div class="col">
+
+    <h3>Wednesday</h3>
     <table>
         <thead><td>Time (HH:MM)</td><td>Temperature (°C)</td><td>Delete?</td></thead>
     {#for transition in schedules.wednesdaySchedules}
@@ -48,7 +68,10 @@
         <tr><td><input name="wednesday-{schedules.wednesdaySchedules.size + 1}-time" value=""/></td><td><input name="wednesday-{schedules.wednesdaySchedules.size + 1}-temperature" value=""/></td><td></td></tr>
     </table> 
 
-    <h2>Thursday</h2>
+    </div>    
+    <div class="col">
+
+    <h3>Thursday</h3>
     <table>
         <thead><td>Time (HH:MM)</td><td>Temperature (°C)</td><td>Delete?</td></thead>
     {#for transition in schedules.thursdaySchedules}
@@ -58,7 +81,12 @@
         <tr><td><input name="thursday-{schedules.thursdaySchedules.size + 1}-time" value=""/></td><td><input name="thursday-{schedules.thursdaySchedules.size + 1}-temperature" value=""/></td><td></td></tr>
     </table> 
 
-    <h2>Friday</h2>
+      </div>
+      </div>
+    <div class="row">
+    <div class="col">
+
+    <h3>Friday</h3>
     <table>
         <thead><td>Time (HH:MM)</td><td>Temperature (°C)</td><td>Delete?</td></thead>
     {#for transition in schedules.fridaySchedules}
@@ -68,7 +96,10 @@
         <tr><td><input name="friday-{schedules.fridaySchedules.size + 1}-time" value=""/></td><td><input name="friday-{schedules.fridaySchedules.size + 1}-temperature" value=""/></td><td></td></tr>
     </table>   
 
-    <h2>Saturday</h2>
+  </div>
+    <div class="col">
+
+    <h3>Saturday</h3>
     <table>
         <thead><td>Time (HH:MM)</td><td>Temperature (°C)</td><td>Delete?</td></thead>
     {#for transition in schedules.saturdaySchedules}
@@ -78,7 +109,12 @@
         <tr><td><input name="saturday-{schedules.saturdaySchedules.size + 1}-time" value=""/></td><td><input name="saturday-{schedules.saturdaySchedules.size + 1}-temperature" value=""/></td><td></td></tr>
     </table>
 
-    <h2>Sunday</h2>
+    </div>
+    </div>
+    <div class="row">
+    <div class="col">
+
+    <h3>Sunday</h3>
     <table>
         <thead><td>Time (HH:MM)</td><td>Temperature (°C)</td><td>Delete?</td></thead>
     {#for transition in schedules.sundaySchedules}
@@ -88,7 +124,10 @@
         <tr><td><input name="sunday-{schedules.sundaySchedules.size + 1}-time" value=""/></td><td><input name="sunday-{schedules.sundaySchedules.size + 1}-temperature" value=""/></td><td></td></tr>
     </table>  
 
-    <h2>Holidays</h2>
+    </div>
+    <div class="col">
+
+    <h3>Holidays</h3>
     <table>
         <thead><td>Time (HH:MM)</td><td>Temperature (°C)</td><td>Delete?</td></thead>
     {#for transition in schedules.holidaySchedules}
@@ -96,12 +135,16 @@
     {/for}    
         <tr><td><input name="holidays-{schedules.holidaySchedules.size}-time" value=""/></td><td><input name="holidays-{schedules.holidaySchedules.size}-temperature" value=""/></td><td></td></tr>
         <tr><td><input name="holidays-{schedules.holidaySchedules.size + 1}-time" value=""/></td><td><input name="holidays-{schedules.holidaySchedules.size + 1}-temperature" value=""/></td><td></td></tr>
-    </table>    
+    </table>   
+
+    </div> 
+    </div>
 
     <br>
-    <input type="submit" value="Update Thermostat"/>
+    <input type="submit" value="Update Thermostat" class="btn btn-primary"/>
     </form>
 
     {/if}
+
 </body>
 </html>

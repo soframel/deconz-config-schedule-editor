@@ -2,3 +2,4 @@ target/**
 local.properties
 .env
 .vscode
+deploy.sh

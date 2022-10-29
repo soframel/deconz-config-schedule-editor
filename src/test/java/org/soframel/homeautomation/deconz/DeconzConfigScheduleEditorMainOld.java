@@ -19,8 +19,10 @@ import org.soframel.homeautomation.deconz.model.TransitionModel;
  * sensorId
  * then call with either no parameters (will print existing schedules), or "delete" to delete all, and/or "create" to (re-)create the schedules:
  * mvn org.codehaus.mojo:exec-maven-plugin:java (adapt action arguments in the pom.xml, maven-exec-plugin, to only delete or create if needed)
+ * 
+ * -> moved, exec plugin removed, only used for testing
  */
-public class DeconzConfigScheduleEditorMain {
+public class DeconzConfigScheduleEditorMainOld {
 
     public static void main(String[] args) {
         try (FileReader reader = new FileReader(".env")) {
@@ -31,7 +33,7 @@ public class DeconzConfigScheduleEditorMain {
             String sensorId = props.getProperty("SENSORID");
 
             DeconzConfigScheduleClient client = new DeconzConfigScheduleClient(url, key);
-            DeconzConfigScheduleEditorMain editor = new DeconzConfigScheduleEditorMain(client, sensorId);            
+            DeconzConfigScheduleEditorMainOld editor = new DeconzConfigScheduleEditorMainOld(client, sensorId);            
             editor.printAllSchedules();
 
             List<String> argsList=Arrays.asList(args);
@@ -53,7 +55,7 @@ public class DeconzConfigScheduleEditorMain {
     DeconzConfigScheduleClient client;
     String sensorId;
 
-    public DeconzConfigScheduleEditorMain(DeconzConfigScheduleClient client, String sensorId) {
+    public DeconzConfigScheduleEditorMainOld(DeconzConfigScheduleClient client, String sensorId) {
         this.client = client;
         this.sensorId=sensorId;
     }

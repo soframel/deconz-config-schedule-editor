@@ -1,7 +1,0 @@
-#Connection to deCONZ
-URL=http://127.0.0.1:8080
-KEY=MYKEY
-#Sensor ID (for main only)
-SENSORID=MYSENSOR
-#List of thermostats, of the form THERMOSTATS_NAME=id where name is call caps and no special char, and id is the sensor id in deCONZ.
-THERMOSTATS_ROOM1=5
