@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -46,7 +47,7 @@ public class DeconzConfigScheduleClient {
         webTarget = client.target(sensorURL);
     }
 
-    public void close(){
+    public void close() {
         client.close();
     }
 
@@ -58,7 +59,14 @@ public class DeconzConfigScheduleClient {
 
         Map<String, List<Transition>> schedulesJSON = s.getConfig().getSchedule();
 
-        return schedulesJSON.keySet().stream()
+        if(logger.isLoggable(Level.FINE)){
+            for(String time: schedulesJSON.keySet()){
+                List<Transition> transitions=schedulesJSON.get(time);
+                logger.fine("For schedule "+time+": transitions: "+transitions);
+            }
+        }
+
+        Map<DaysOfWeekSchedule, List<TransitionModel>> schedules= schedulesJSON.keySet().stream()
                 .collect(Collectors.toMap(
                         DaysOfWeekSchedule::parse,
                         ((String schedule) -> {
@@ -67,6 +75,15 @@ public class DeconzConfigScheduleClient {
                             })
                                     .collect(Collectors.toList());
                         })));
+
+        if(logger.isLoggable(Level.FINE)){
+            for(DaysOfWeekSchedule schedule: schedules.keySet()){
+                List<TransitionModel> transitions=schedules.get(schedule);
+                logger.fine("Interpreted: For schedule "+schedule+": transitions: "+transitions);
+            }
+        }
+
+        return schedules;
     }
 
     public void deleteAllSchedules(String sensorId) throws SchedulerException {
@@ -83,17 +100,19 @@ public class DeconzConfigScheduleClient {
         if (r.getStatus() == 200) {
             logger.info("Deleted schedule " + bitmap);
         } else {
-            String message="An error occured while deleting " + bitmap + ": " + r.getStatus() + ", " + r.getStatusInfo();
+            String message = "An error occured while deleting " + bitmap + ": " + r.getStatus() + ", "
+                    + r.getStatusInfo();
             logger.info(message);
             throw new SchedulerException(message);
         }
     }
 
-    public void createSchedule(String sensorId, DaysOfWeekSchedule schedule, TransitionModel... transitions) throws SchedulerException {
+    public void createSchedule(String sensorId, DaysOfWeekSchedule schedule, TransitionModel... transitions)
+            throws SchedulerException {
         if (transitions.length == 0) {
-            logger.info("nothing to create for "+schedule);
+            logger.info("nothing to create for " + schedule);
         } else {
-            logger.info("for schedule "+schedule+", creating transitions "+Arrays.deepToString(transitions));
+            logger.info("for schedule " + schedule + ", creating transitions " + Arrays.deepToString(transitions));
             String bitmap = schedule.toBitmapString();
             Invocation.Builder invocationBuilder = webTarget.path(sensorId + "/config/schedule/" + bitmap)
                     .request(MediaType.APPLICATION_JSON);
@@ -106,7 +125,8 @@ public class DeconzConfigScheduleClient {
             if (r.getStatus() == 200) {
                 logger.info("Schedule created for " + bitmap);
             } else {
-                String message="An error occured while creating " + bitmap + ": " + r.getStatus() + ", " + r.getStatusInfo();
+                String message = "An error occured while creating " + bitmap + ": " + r.getStatus() + ", "
+                        + r.getStatusInfo();
                 logger.info(message);
                 throw new SchedulerException(message);
             }
