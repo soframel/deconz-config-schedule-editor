@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -44,6 +45,7 @@ public class DeconzConfigDayScheduleResource {
 
     @CheckedTemplate
     public static class Templates {
+        public static native TemplateInstance main(Map<String,String> thermostats, String id, DaySchedule[] schedules);
         public static native TemplateInstance schedule(Map<String,String> thermostats, String id, DaySchedule schedule);
     }
 
@@ -51,21 +53,26 @@ public class DeconzConfigDayScheduleResource {
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance get(@DefaultValue("") @QueryParam("id") String sensorid) {
         logger.info("getting schedules");
-        //only monday for now
-        DaySchedule monday=null;
+        
+        DaySchedule[] schedules=new DaySchedule[8];
         if(sensorid!=null && !sensorid.equals("")){
             Map<Day, List<TransitionModel>> data =client.getAllSchedules(sensorid);
             
             for(Day day: data.keySet()){
                 List<TransitionModel> trans=data.get(day);
                 DaySchedule schedule=new DaySchedule(trans, day);
-                //temporary
-                if(day.getIndex()==0){
-                    monday=schedule;
-                }
+                schedules[day.getIndex()]=schedule;
             }            
         }
-        return Templates.schedule(thermostats,sensorid, monday);        
+        //the fill missing days
+        for(int i=0;i<=7;i++){
+            if(schedules[i]==null){
+                schedules[i]=new DaySchedule(new ArrayList<TransitionModel>(), new Day(i));
+            }
+            logger.fine("schedule["+i+"]: "+schedules[i]);
+        }
+
+        return Templates.main(thermostats,sensorid, schedules);        
     }
 
     @POST
@@ -106,8 +113,8 @@ public class DeconzConfigDayScheduleResource {
         this.sleep(3000);
         logger.info("schedule saved for day "+schedule.getDay()+" for thermostat "+thermostatId);
 
-        //return page
-        return Templates.schedule(thermostats,thermostatId, schedule);
+        //return main page, reloaded
+        return this.get(thermostatId);
     }
 
     private void sleep(int milliseconds){

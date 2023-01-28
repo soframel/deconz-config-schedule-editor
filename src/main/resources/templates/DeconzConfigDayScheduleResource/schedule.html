@@ -5,9 +5,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Thermostats Weekly Schedules</title> 
-<link rel="stylesheet" href="./bootstrap.min.css"/>
-<link rel="stylesheet" href="./app.css"/>
+<title>Thermostats Daily Schedules</title> 
 </head>
 <body>
 
@@ -25,27 +23,8 @@
         <tr><td><input name="{schedule.transitions.size + 1}-time" value=""/></td><td><input name="{schedule.transitions.size + 1}-temperature" value=""/></td><td></td></tr>
     </table>
 
-    <input id="submit" type="submit" value="Update" class="btn btn-primary"/>
-    <div id="spinner" class="spinner-border" role="status" >
-    </div>
+    <input id="submit-{schedule.day.index}" type="submit" value="Update" class="btn btn-secondary scheduleSubmit"/>        
     </form>
 
-
-<script>
-
-        document.getElementById('spinner').style.visibility = "hidden";
-
-        document.addEventListener("click", function(e){
-            const target = e.target.closest("#submit");
-            if(target){
-                showSpinner();
-            }
-            });
-
-    function showSpinner(){
-        document.getElementById('spinner').style.visibility = "visible";
-    }
-
-</script>
 </body>
 </html>
