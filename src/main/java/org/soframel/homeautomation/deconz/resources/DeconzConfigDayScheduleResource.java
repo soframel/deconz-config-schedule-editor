@@ -2,10 +2,11 @@ package org.soframel.homeautomation.deconz.resources;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -21,10 +22,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.soframel.homeautomation.deconz.DeconzConfigScheduleClient;
 import org.soframel.homeautomation.deconz.SchedulerException;
-import org.soframel.homeautomation.deconz.model.DaysOfWeekSchedule;
-import org.soframel.homeautomation.deconz.model.ScheduleForEachDay;
+import org.soframel.homeautomation.deconz.client.DeconzConfigScheduleClientInterface;
+import org.soframel.homeautomation.deconz.client.MockConfigScheduleClient;
+import org.soframel.homeautomation.deconz.model.Day;
+import org.soframel.homeautomation.deconz.model.DaySchedule;
 import org.soframel.homeautomation.deconz.model.TransitionModel;
 
 import io.quarkus.qute.CheckedTemplate;
@@ -32,29 +34,46 @@ import io.quarkus.qute.TemplateInstance;
 
 @Path("/")
 @ApplicationScoped
-public class DeconzConfigScheduleResource {
-    private static Logger logger = Logger.getLogger(DeconzConfigScheduleResource.class.getName());
+public class DeconzConfigDayScheduleResource {
+    private static Logger logger = Logger.getLogger(DeconzConfigDayScheduleResource.class.getName());
 
     @ConfigProperty(name = "thermostat") 
     Map<String,String> thermostats;
 
     @Inject
-    DeconzConfigScheduleClient client;
+    DeconzConfigScheduleClientInterface client;
+    //for tests: comment @Inject and add =new MockConfigScheduleClient()
 
     @CheckedTemplate
     public static class Templates {
-        public static native TemplateInstance schedules(Map<String,String> thermostats, String id, ScheduleForEachDay schedules);
+        public static native TemplateInstance main(Map<String,String> thermostats, String id, DaySchedule[] schedules);
+        public static native TemplateInstance schedule(Map<String,String> thermostats, String id, DaySchedule schedule);
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance get(@DefaultValue("") @QueryParam("id") String sensorid) {
-        ScheduleForEachDay schedules=null;
+        logger.info("getting schedules");
+        
+        DaySchedule[] schedules=new DaySchedule[8];
         if(sensorid!=null && !sensorid.equals("")){
-            Map<DaysOfWeekSchedule, List<TransitionModel>> data =client.getAllSchedules(sensorid);
-            schedules=ScheduleForEachDay.parseFromScheduleMap(data);
+            Map<Day, List<TransitionModel>> data =client.getAllSchedules(sensorid);
+            
+            for(Day day: data.keySet()){
+                List<TransitionModel> trans=data.get(day);
+                DaySchedule schedule=new DaySchedule(trans, day);
+                schedules[day.getIndex()]=schedule;
+            }            
         }
-        return Templates.schedules(thermostats,sensorid, schedules);        
+        //the fill missing days
+        for(int i=0;i<=7;i++){
+            if(schedules[i]==null){
+                schedules[i]=new DaySchedule(new ArrayList<TransitionModel>(), new Day(i));
+            }
+            logger.fine("schedule["+i+"]: "+schedules[i]);
+        }
+
+        return Templates.main(thermostats,sensorid, schedules);        
     }
 
     @POST
@@ -64,11 +83,16 @@ public class DeconzConfigScheduleResource {
             MultivaluedMap<String, String> form) throws SchedulerException {
         logger.info("saving schedule: " + form);
         //Transform schedule data
-        ScheduleForEachDay schedule = new ScheduleForEachDay();
-        String thermostat="";
+        DaySchedule schedule=new DaySchedule();
+        schedule.setTransitions(new ArrayList<TransitionModel>());
+        String thermostatId="";
+        int day=-1;
         for (String key : form.keySet()) {
             if("id".equals(key)){
-                thermostat=form.getFirst(key);
+                thermostatId=form.getFirst(key);
+            }
+            else if("day".equals(key)){
+                day=Integer.parseInt(form.getFirst(key));
             }
             else{
                 List<String> dataList = form.get(key);
@@ -79,26 +103,33 @@ public class DeconzConfigScheduleResource {
                 }
             }
         }
+        schedule.setDay(new Day(day));
         //then filter out all TransitionModel with no temperature=deletes
         schedule.filterOutEmptyTemperatures();
 
         // save thermostat schedule
-        client.deleteAllSchedules(thermostat);
-        Map<DaysOfWeekSchedule, List<TransitionModel>> formattedSchedules=schedule.getDayOfWeekSchedules();
-        for(DaysOfWeekSchedule s: formattedSchedules.keySet()){
-            client.createSchedule(thermostat, s, formattedSchedules.get(s).toArray(new TransitionModel[0]));
-        }
-        logger.info("schedules saved for thermostat "+thermostat);
+        client.deleteSchedule(thermostatId, schedule.getDay());
+        this.sleep(1000);
+        client.createSchedule(thermostatId, schedule.getDay(), schedule.getTransitions());
+        this.sleep(3000);
+        logger.info("schedule saved for day "+schedule.getDay()+" for thermostat "+thermostatId);
 
-        //return page
-        return Templates.schedules(thermostats,thermostat, schedule);
+        //return main page, reloaded
+        return this.get(thermostatId);
     }
 
-    private void addDataToSchedule(ScheduleForEachDay schedule, String key, String data) throws SchedulerException {
+    private void sleep(int milliseconds){
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            //nothing
+        }
+    }
+
+    private void addDataToSchedule(DaySchedule schedule, String key, String data) throws SchedulerException {
         if (data != null && !data.equals("")) {
             logger.info("parsing param "+key+", data="+data);
-            StringTokenizer tokenizer = new StringTokenizer(key, "-", false);
-            String day = tokenizer.nextToken();
+            StringTokenizer tokenizer = new StringTokenizer(key, "-", false);            
             int index = -1;
             try {
                 index = Integer.parseInt(tokenizer.nextToken());
@@ -108,19 +139,8 @@ public class DeconzConfigScheduleResource {
             String nextToken=tokenizer.nextToken();
             boolean isTime = (nextToken.equals("time"));
             boolean isDelete = (nextToken.equals("delete"));
-
-            List<TransitionModel> daySchedules=null;
-            if("holidays".equals(day)){daySchedules=schedule.getHolidaySchedules();}
-            else if("monday".equals(day)){daySchedules=schedule.getMondaySchedules();}
-            else if("tuesday".equals(day)){daySchedules=schedule.getTuesdaySchedules();}
-            else if("wednesday".equals(day)){daySchedules=schedule.getWednesdaySchedules();}
-            else if("thursday".equals(day)){daySchedules=schedule.getThursdaySchedules();}
-            else if("friday".equals(day)){daySchedules=schedule.getFridaySchedules();}
-            else if("saturday".equals(day)){daySchedules=schedule.getSaturdaySchedules();}
-            else if("sunday".equals(day)){daySchedules=schedule.getSundaySchedules();}
-            else { throw new SchedulerException("Unrecognized day in entry " + key);
-            };
-            TransitionModel trans =  this.getOrCreateTransition(daySchedules, index);
+            
+            TransitionModel trans =  this.getOrCreateTransition(schedule.getTransitions(), index);
 
             if (isTime) {
                 // parse value
@@ -158,25 +178,4 @@ public class DeconzConfigScheduleResource {
         }
     }
 
-    // to be replaced by REST calls
-    /*private Map<DaysOfWeekSchedule, List<TransitionModel>> getTestData() {
-        Map<DaysOfWeekSchedule, List<TransitionModel>> map = new HashMap<>();
-
-        DaysOfWeekSchedule s = new DaysOfWeekSchedule(true, false, false, false, true, false, false);
-        TransitionModel t1 = new TransitionModel(LocalTime.of(7, 0), 16);
-        TransitionModel t2 = new TransitionModel(LocalTime.of(18, 0), 18);
-        map.put(s, List.of(t1, t2));
-
-        DaysOfWeekSchedule s2 = new DaysOfWeekSchedule(false, true, false, true, true, true, false);
-        TransitionModel t3 = new TransitionModel(LocalTime.of(9, 30), 21);
-        TransitionModel t4 = new TransitionModel(LocalTime.of(21, 0), 18);
-        map.put(s2, List.of(t3, t4));
-
-        DaysOfWeekSchedule s3 = new DaysOfWeekSchedule(true);
-        TransitionModel t5 = new TransitionModel(LocalTime.of(9, 30), 21);
-        TransitionModel t6 = new TransitionModel(LocalTime.of(21, 0), 18);
-        map.put(s3, List.of(t5, t6));
-
-        return map;
-    }*/
 }

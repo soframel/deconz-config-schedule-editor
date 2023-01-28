@@ -1,0 +1,31 @@
+{@java.util.Map<String,String> thermostats} 
+{@String id} 
+{@org.soframel.homeautomation.deconz.model.DaySchedule schedule} 
+{@String style} 
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Thermostats Daily Schedules</title> 
+</head>
+<body>
+
+    <form action="/" method="POST">
+    <h3>{schedule.day}</h3>
+    <input type="hidden" name="id" value="{id}"/>    
+    <input type="hidden" name="day" value="{schedule.day.index}"/>    
+
+    <table class="table table-sm table-{style}">
+        <thead><tr><th>Time (HH:MM)</th><th>Temperature (°C)</th><th>Delete?</th></tr></thead>
+    {#for transition in schedule.transitions}
+        <tr><td><input name="{transition_index}-time" value="{transition.time}"/></td><td><input name="{transition_index}-temperature" value="{transition.temperature}"/></td><td><input type="checkbox" name="{transition_index}-delete" value="true"></td></tr>
+    {/for}    
+        <tr><td><input name="{schedule.transitions.size}-time" value=""/></td><td><input name="{schedule.transitions.size}-temperature" value=""/></td><td></td></tr>
+        <tr><td><input name="{schedule.transitions.size + 1}-time" value=""/></td><td><input name="{schedule.transitions.size + 1}-temperature" value=""/></td><td></td></tr>
+    </table>
+
+    <input id="submit-{schedule.day.index}" type="submit" value="Update" class="btn btn-secondary scheduleSubmit"/>        
+    </form>
+
+</body>
+</html>

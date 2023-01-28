@@ -1,7 +1,8 @@
-package org.soframel.homeautomation.deconz;
+package org.soframel.homeautomation.deconz.client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -18,16 +19,17 @@ import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.config.ConfigProvider;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.soframel.homeautomation.deconz.SchedulerException;
 import org.soframel.homeautomation.deconz.dto.Sensor;
 import org.soframel.homeautomation.deconz.dto.Transition;
-import org.soframel.homeautomation.deconz.model.DaysOfWeekSchedule;
+import org.soframel.homeautomation.deconz.model.Day;
 import org.soframel.homeautomation.deconz.model.TransitionModel;
 
 /**
  * REST client class
  */
 @ApplicationScoped
-public class DeconzConfigScheduleClient {
+public class DeconzConfigScheduleClient implements DeconzConfigScheduleClientInterface{
     private static Logger logger = Logger.getLogger(DeconzConfigScheduleClient.class.getName());
 
     private ResteasyClient client;
@@ -51,7 +53,7 @@ public class DeconzConfigScheduleClient {
         client.close();
     }
 
-    public Map<DaysOfWeekSchedule, List<TransitionModel>> getAllSchedules(String sensorId) {
+    public Map<Day, List<TransitionModel>> getAllSchedules(String sensorId) {
 
         Invocation.Builder invocationBuilder = webTarget.path(sensorId).request(MediaType.APPLICATION_JSON);
         Sensor s = invocationBuilder.get(Sensor.class);
@@ -59,27 +61,36 @@ public class DeconzConfigScheduleClient {
 
         Map<String, List<Transition>> schedulesJSON = s.getConfig().getSchedule();
 
-        if(logger.isLoggable(Level.FINE)){
-            for(String time: schedulesJSON.keySet()){
-                List<Transition> transitions=schedulesJSON.get(time);
+        Map<Day, List<TransitionModel>> schedules=new HashMap<Day, List<TransitionModel>>();
+        for(String time: schedulesJSON.keySet()){
+            //covert transitions
+            List<Transition> transitions=schedulesJSON.get(time);
+            if(logger.isLoggable(Level.FINE)){
                 logger.fine("For schedule "+time+": transitions: "+transitions);
+            }
+            List<TransitionModel> models=transitions.stream().map((Transition t) -> {
+                return TransitionModel.parse(t);
+            }).collect(Collectors.toList());
+
+            //convert day
+            //there may be more than 1 day in one Transition
+            List<Day> days=Day.parse(time);            
+            for(Day day: days){
+                if(schedules.containsKey(day)){
+                    List<TransitionModel> previousModels=schedules.get(day);
+                    previousModels.addAll(models);
+                }
+                else{
+                    schedules.put(day, models);
+                }
             }
         }
 
-        Map<DaysOfWeekSchedule, List<TransitionModel>> schedules= schedulesJSON.keySet().stream()
-                .collect(Collectors.toMap(
-                        DaysOfWeekSchedule::parse,
-                        ((String schedule) -> {
-                            return schedulesJSON.get(schedule).stream().map((Transition t) -> {
-                                return TransitionModel.parse(t);
-                            })
-                                    .collect(Collectors.toList());
-                        })));
 
         if(logger.isLoggable(Level.FINE)){
-            for(DaysOfWeekSchedule schedule: schedules.keySet()){
-                List<TransitionModel> transitions=schedules.get(schedule);
-                logger.fine("Interpreted: For schedule "+schedule+": transitions: "+transitions);
+            for(Day day: schedules.keySet()){
+                List<TransitionModel> transitions=schedules.get(day);
+                logger.fine("Interpreted: For day "+day+": transitions: "+transitions);
             }
         }
 
@@ -87,14 +98,14 @@ public class DeconzConfigScheduleClient {
     }
 
     public void deleteAllSchedules(String sensorId) throws SchedulerException {
-        Map<DaysOfWeekSchedule, List<TransitionModel>> schedules = this.getAllSchedules(sensorId);
-        for (DaysOfWeekSchedule schedule : schedules.keySet()) {
+        Map<Day, List<TransitionModel>> schedules = this.getAllSchedules(sensorId);
+        for (Day schedule : schedules.keySet()) {
             logger.info("deleting schedule=" + schedule);
             this.deleteSchedule(sensorId, schedule);
         }
     }
 
-    public void deleteSchedule(String sensorId, DaysOfWeekSchedule schedule) throws SchedulerException {
+    public void deleteSchedule(String sensorId, Day schedule) throws SchedulerException {
         String bitmap = schedule.toBitmapString();
         Response r = webTarget.path(sensorId + "/config/schedule/" + bitmap).request().delete();
         if (r.getStatus() == 200) {
@@ -107,16 +118,16 @@ public class DeconzConfigScheduleClient {
         }
     }
 
-    public void createSchedule(String sensorId, DaysOfWeekSchedule schedule, TransitionModel... transitions)
+    public void createSchedule(String sensorId, Day schedule, List<TransitionModel> transitions)
             throws SchedulerException {
-        if (transitions.length == 0) {
+        if (transitions.size() == 0) {
             logger.info("nothing to create for " + schedule);
         } else {
-            logger.info("for schedule " + schedule + ", creating transitions " + Arrays.deepToString(transitions));
+            logger.info("for schedule " + schedule + ", creating transitions " + transitions);
             String bitmap = schedule.toBitmapString();
             Invocation.Builder invocationBuilder = webTarget.path(sensorId + "/config/schedule/" + bitmap)
                     .request(MediaType.APPLICATION_JSON);
-            List<Transition> list = Arrays.asList(transitions).stream()
+            List<Transition> list = transitions.stream()
                     .map((TransitionModel t) -> {
                         return new Transition(t.getTemperature(), TransitionModel.formatter.format(t.getTime()));
                     })

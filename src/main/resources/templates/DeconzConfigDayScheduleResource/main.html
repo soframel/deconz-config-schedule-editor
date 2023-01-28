@@ -1,0 +1,108 @@
+{@java.util.Map<String,String> thermostats} 
+{@String id} 
+{@org.soframel.homeautomation.deconz.model.DaySchedule[] schedules} 
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Thermostats Weekly Schedules</title> 
+<link rel="stylesheet" href="./bootstrap.min.css"/>
+<style>
+    #overlay {
+        background-color: rgba(0, 0, 0, 0.279);
+        z-index: 999;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+    
+    }
+
+    #spinner{
+        position: fixed;
+        z-index: 1000;
+        top: 40%;
+    }
+
+</style>
+</head>
+<body>
+    <h1>Thermostats Weekly Schedules</h1>
+    <ul class="list-group">  
+    {#each thermostats}
+        <li class="list-group-item"><a href="/?id={it.key}">{it.value}</a></li>
+    {/each}
+    </ul>
+    
+
+    {#if id}
+<!--thermostat schedules for all days of week -->
+
+<br/>
+    <h2>{thermostats.get(id)}</h2>
+    
+    <!--spinner-->
+<div id="overlay" >
+    <div class="d-flex justify-content-center">
+      <div id="spinner" class="spinner-border" role="status" >
+      </div>
+    </div>
+  </div>
+    
+    <br/>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col">
+        {#include DeconzConfigDayScheduleResource/schedule.html thermostats=thermostats id=id schedule=schedules[0] style="primary"/} 
+    </div>    
+    <div class="col">
+        {#include DeconzConfigDayScheduleResource/schedule.html thermostats=thermostats id=id schedule=schedules[1] style="secondary"/} 
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {#include DeconzConfigDayScheduleResource/schedule.html thermostats=thermostats id=id schedule=schedules[2] style="secondary"/} 
+    </div>    
+    <div class="col">
+        {#include DeconzConfigDayScheduleResource/schedule.html thermostats=thermostats id=id schedule=schedules[3] style="primary"/} 
+    </div>
+</div>
+<div class="row">
+   <div class="col">
+        {#include DeconzConfigDayScheduleResource/schedule.html thermostats=thermostats id=id schedule=schedules[4] style="primary"/} 
+    </div>    
+    <div class="col">
+        {#include DeconzConfigDayScheduleResource/schedule.html thermostats=thermostats id=id schedule=schedules[5] style="secondary"/} 
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {#include DeconzConfigDayScheduleResource/schedule.html thermostats=thermostats id=id schedule=schedules[6] style="secondary"/} 
+    </div>    
+     <div class="col">
+     &nbsp;
+    </div>    
+</div>
+
+    {/if}
+
+
+<script>
+
+        document.getElementById("overlay").style.visibility = "hidden";
+
+        const buttons = document.querySelectorAll('.scheduleSubmit')
+        buttons.forEach(function(currentBtn){
+            currentBtn.addEventListener('click', showSpinner)
+        })
+
+    function showSpinner(){
+        document.getElementById('overlay').style.visibility = "visible";
+    }
+
+</script>
+
+</body>
+</html>
