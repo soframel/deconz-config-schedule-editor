@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -39,9 +40,9 @@ public class DeconzConfigDayScheduleResource {
     @ConfigProperty(name = "thermostat") 
     Map<String,String> thermostats;
 
-    //TODO: commentted for tests
-    //@Inject
-    DeconzConfigScheduleClientInterface client=new MockConfigScheduleClient();
+    @Inject
+    DeconzConfigScheduleClientInterface client;
+    //for tests: comment @Inject and add =new MockConfigScheduleClient()
 
     @CheckedTemplate
     public static class Templates {
