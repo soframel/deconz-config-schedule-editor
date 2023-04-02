@@ -20,6 +20,10 @@ NOTE: Requires transformation add-ons JSONPATH and JINJA, to be installed in Ope
 - stateTransformation=JSONPATH:$.config.schedule_on
 - commandTransformation='JINJA:{"config": {"schedule_on": {{value}} }}'
 
++ change some things that are not in UI in code! (see next section)
+- commandMethod: PUT
+- password: none
+
 ## OpenHab  Yaml
 ````
 label: Thermostat 1 Schedule

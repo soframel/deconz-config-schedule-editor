@@ -60,7 +60,9 @@ public class DeconzConfigScheduleClient implements DeconzConfigScheduleClientInt
         logger.info("sensor=" + s);
 
         Map<String, List<Transition>> schedulesJSON = s.getConfig().getSchedule();
-
+        if(schedulesJSON==null){
+            schedulesJSON=new HashMap<String,List<Transition>>();
+        }
         Map<Day, List<TransitionModel>> schedules=new HashMap<Day, List<TransitionModel>>();
         for(String time: schedulesJSON.keySet()){
             //covert transitions
@@ -110,7 +112,12 @@ public class DeconzConfigScheduleClient implements DeconzConfigScheduleClientInt
         Response r = webTarget.path(sensorId + "/config/schedule/" + bitmap).request().delete();
         if (r.getStatus() == 200) {
             logger.info("Deleted schedule " + bitmap);
-        } else {
+        } 
+        else if(r.getStatus()==404){
+            //not important, didnt exist -> only log
+            logger.info("Schedule did not exist");
+        }
+        else {
             String message = "An error occured while deleting " + bitmap + ": " + r.getStatus() + ", "
                     + r.getStatusInfo();
             logger.info(message);
