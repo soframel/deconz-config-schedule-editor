@@ -5,7 +5,10 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
+@RegisterForReflection
 public class Config {
     private boolean schedule_on;
     private Map<String,List<Transition>> schedule;

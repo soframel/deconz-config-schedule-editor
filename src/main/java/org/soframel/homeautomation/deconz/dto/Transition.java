@@ -1,5 +1,8 @@
 package org.soframel.homeautomation.deconz.dto;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 public class Transition {
     private int heatsetpoint;
     private String localtime;
