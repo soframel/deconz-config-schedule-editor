@@ -1,6 +1,8 @@
 package org.soframel.homeautomation.deconz.model;
 
 import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 public class DaySchedule {
@@ -28,6 +30,24 @@ public class DaySchedule {
     @Override
     public String toString() {
         return "DaySchedule [ day=" + day + ", transitions=" + transitions+"]";
+    }
+
+    //transitions must be ordered, adapt transitions list so that they are
+    public void orderTransitions(){
+        Comparator<TransitionModel> comp=new Comparator<TransitionModel>() {
+            public int compare(TransitionModel t1, TransitionModel t2){
+                if(t1==null){
+                    return -1;
+                }
+                else if(t2==null){
+                    return 1;
+                }
+                else {
+                    return t1.time.compareTo(t2.time);
+                }
+            }
+        };
+        transitions.sort(comp);
     }
 
     /**

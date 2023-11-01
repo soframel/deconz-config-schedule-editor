@@ -110,6 +110,8 @@ public class DeconzConfigDayScheduleResource {
         // save thermostat schedule
         client.deleteSchedule(thermostatId, schedule.getDay());
         this.sleep(1000);
+        //order transitions before save
+        schedule.orderTransitions();
         client.createSchedule(thermostatId, schedule.getDay(), schedule.getTransitions());
         this.sleep(3000);
         logger.info("schedule saved for day "+schedule.getDay()+" for thermostat "+thermostatId);
