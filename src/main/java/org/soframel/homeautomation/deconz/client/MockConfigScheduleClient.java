@@ -4,8 +4,10 @@ import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.soframel.homeautomation.deconz.SchedulerException;
+import org.soframel.homeautomation.deconz.dto.Sensor;
 import org.soframel.homeautomation.deconz.model.Day;
 import org.soframel.homeautomation.deconz.model.TransitionModel;
 
@@ -13,6 +15,8 @@ import org.soframel.homeautomation.deconz.model.TransitionModel;
  * simple in memory client for tests, not calling anything
  */
 public class MockConfigScheduleClient implements DeconzConfigScheduleClientInterface{
+    Logger logger=Logger.getLogger(MockConfigScheduleClient.class.getName());
+
     Map<Day, List<TransitionModel>> map = new HashMap<>();
 
     @Override
@@ -56,6 +60,17 @@ public class MockConfigScheduleClient implements DeconzConfigScheduleClientInter
     public void createSchedule(String sensorId, Day schedule, List<TransitionModel> transitions)
             throws SchedulerException {
         map.put(schedule, transitions)        ;
+    }
+
+    @Override
+    public void createScheduleRaw(String sensorId, String scheduleBitmap, List json) throws SchedulerException {
+        logger.info(() -> String.format(">> replacing complete schedule for sensor %s and bitmap %s: \n %s", sensorId, scheduleBitmap, json));                
+    }
+
+    @Override
+    public Sensor getSensorConfig(String sensodId) throws SchedulerException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getSensorConfig'");
     }
     
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.soframel.homeautomation.deconz.SchedulerException;
+import org.soframel.homeautomation.deconz.dto.Sensor;
 import org.soframel.homeautomation.deconz.model.Day;
 import org.soframel.homeautomation.deconz.model.TransitionModel;
 
@@ -19,4 +20,7 @@ public interface DeconzConfigScheduleClientInterface {
 
     public void createSchedule(String sensorId, Day schedule, List<TransitionModel> transitions)
             throws SchedulerException;
+
+    public void createScheduleRaw(String sensorId, String scheduleBitmap, List json) throws SchedulerException;
+    public Sensor getSensorConfig(String sensodId) throws SchedulerException;
 }

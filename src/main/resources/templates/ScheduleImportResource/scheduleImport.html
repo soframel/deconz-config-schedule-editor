@@ -1,0 +1,53 @@
+{@java.util.Map<String,String> thermostats} 
+{@String id} 
+{@org.soframel.homeautomation.deconz.model.DaySchedule[] schedules} 
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Thermostats Weekly Schedules</title> 
+<link rel="stylesheet" href="./bootstrap.min.css"/>
+<style>
+    #overlay {
+        background-color: rgba(0, 0, 0, 0.279);
+        z-index: 999;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+    
+    }
+</style>
+</head>
+<body>
+    <h1>Thermostats Weekly Schedules Importer</h1>
+    <ul class="list-group">  
+    {#each thermostats}
+        <li class="list-group-item"><a href="/import?id={it.key}">{it.value}</a></li>
+    {/each}
+    </ul>
+
+    <br/>    
+
+    {#if id}
+    <h2>{thermostats.get(id)}</h2>
+
+    <form action="/import" method="POST" enctype="multipart/form-data">    
+        <input type="hidden" name="id" value="{id}"/>    
+        <input type="file" id="file" name="file">
+        <input id="submit" type="submit" value="Import" class="btn btn-secondary scheduleSubmit"/>        
+    </form>
+    
+    <br/>
+    <a href="/import/{id}/export" target="_blank">Export existing schedules</a>
+    {/if}
+
+
+<br/>
+
+<hr/>
+<a href="/import">Import</a>
+
+</body>
+</html>

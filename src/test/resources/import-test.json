@@ -1,0 +1,22 @@
+{
+    "W124": [
+        {
+            "heatsetpoint": 2000,
+            "localtime": "T06:10"
+        },
+        {
+            "heatsetpoint": 1800,
+            "localtime": "T07:00"
+        }
+    ],
+    "W3": [
+        {
+            "heatsetpoint": 2000,
+            "localtime": "T07:00"
+        },
+        {
+            "heatsetpoint": 1800,
+            "localtime": "T09:00"
+        }
+    ]
+}

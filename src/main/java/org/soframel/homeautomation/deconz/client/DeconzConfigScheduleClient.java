@@ -150,4 +150,31 @@ public class DeconzConfigScheduleClient implements DeconzConfigScheduleClientInt
             }
         }
     }
+
+    /**
+     * lower level method to replace all schedules for a sensor, using directly the correct JSON format
+     * @param sensorId
+     * @param json
+     * @throws SchedulerException
+     */
+    public void createScheduleRaw(String sensorId, String scheduleBitmap, List schedule) throws SchedulerException{
+            Invocation.Builder invocationBuilder = webTarget.path(sensorId + "/config/schedule/"+scheduleBitmap)
+                    .request(MediaType.APPLICATION_JSON);
+            Response r = invocationBuilder.post(Entity.entity(schedule, MediaType.APPLICATION_JSON));
+            if (r.getStatus() == 200) {
+                logger.info("Schedule created for " + scheduleBitmap);
+            } else {
+                String message = "An error occured while creating " + scheduleBitmap + ": " + r.getStatus() + ", "
+                        + r.getStatusInfo();
+                logger.info(message);
+                throw new SchedulerException(message);
+            }
+    }
+
+    @Override
+    public Sensor getSensorConfig(String sensorId) throws SchedulerException {
+        Invocation.Builder invocationBuilder = webTarget.path(sensorId).request(MediaType.APPLICATION_JSON);
+        Sensor s = invocationBuilder.get(Sensor.class);
+        return s;
+    }
 }
